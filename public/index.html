@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="pt-PT">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Sakura & Sal | Sushi com entrega em Vila Nova de Paiva e Sátão</title>
+<meta name="description" content="Sushi feito na hora com entrega em Vila Nova de Paiva e Sátão. Monte o pedido e envie pelo WhatsApp.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Shippori+Mincho:wght@600;800&family=Zen+Kaku+Gothic+New:wght@400;500;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+<header class="topo">
+<div class="contido">
+<a class="marca" href="#inicio" id="marca" aria-label="Sakura & Sal, início"></a>
+<nav aria-label="Secções" id="nav"></nav>
+<button class="icone-btn" type="button" data-a="abrir-conta" id="btn-conta">
+<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4.4 3.6-7 8-7s8 2.6 8 7"/></svg>
+<span class="so-largo" id="txt-conta">Entrar</span>
+</button>
+<button class="icone-btn cheio" type="button" data-a="abrir-carrinho" id="btn-carrinho">
+<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M5 8h14l-1.2 11.2a2 2 0 0 1-2 1.8H8.200a2 2 0 0 1-2-1.800z"/><path d="M9 8V6a3 3 0 0 1 6 0v2"/></svg>
+<span>Carrinho</span> <span id="conta-itens" aria-live="polite">0</span>
+</button>
+</div>
+</header>
+<main id="inicio">
+<section class="abertura">
+<div id="petalas" aria-hidden="true"></div>
+<div class="contido">
+<div>
+<p class="estado" id="estado"><i></i><span></span></p>
+<h1>Sushi feito na hora, entregue à sua porta.</h1>
+<p class="sub">Entregamos em Vila Nova de Paiva e Sátão. Escolha aqui, envie o pedido pelo WhatsApp e nós confirmamos a hora de entrega.</p>
+<div class="acoes">
+<a class="btn btn-claro" href="#menu">Ver o menu</a>
+<a class="btn btn-fantasma" href="#horario">Horário e entregas</a>
+</div>
+<dl class="factos">
+<div><dt>Entregamos em</dt><dd id="f-zonas"></dd></div>
+<div><dt>Pedido mínimo</dt><dd id="f-min"></dd></div>
+<div><dt>Hoje</dt><dd id="f-hoje"></dd></div>
+</dl>
+</div>
+<div class="travessa" id="travessa" aria-hidden="true"></div>
+</div>
+</section>
+<div id="menu"></div>
+<section class="seccao" id="como">
+<div class="contido">
+<h2>Como encomendar</h2>
+<ol class="passos">
+<li><strong>Escolha o que quer</strong><span>Junte combinados e peças ao carrinho.</span></li>
+<li><strong>Diga-nos onde e quando</strong><span>Indique a morada e a hora. Pode guardar as suas moradas para a próxima vez.</span></li>
+<li><strong>Envie pelo WhatsApp</strong><span>O pedido segue já escrito. Respondemos a confirmar e o pagamento é feito na entrega.</span></li>
+</ol>
+</div>
+</section>
+<section class="seccao" id="horario">
+<div class="contido">
+<h2>Horário e entregas</h2>
+<div class="duas">
+<div>
+<h3>Horário</h3>
+<table><tbody id="tab-horario"></tbody></table>
+<p class="nota">Pode encomendar a qualquer hora e agendar a entrega para o próximo dia aberto.</p>
+</div>
+<div>
+<h3>Zonas e taxa de entrega</h3>
+<table><tbody id="tab-zonas"></tbody></table>
+<p class="nota" id="nota-min"></p>
+</div>
+</div>
+</div>
+</section>
+</main>
+<footer class="rodape">
+<div class="contido">
+<p><strong>Sakura & Sal</strong></p>
+<p>Sushi com entrega em Vila Nova de Paiva e Sátão.</p>
+<p>WhatsApp e telefone: <a id="lig-zap" target="_blank" rel="noopener"></a></p>
+<p><button type="button" class="ligacao" data-a="abrir-admin" style="color:inherit;font-weight:400">Gerir a loja</button></p>
+<p class="pequeno">Os seus dados de conta, moradas e pedidos ficam guardados apenas neste dispositivo e só são enviados para nós quando carrega em enviar no WhatsApp.</p>
+</div>
+</footer>
+<div class="barra" id="barra" hidden>
+<button class="btn btn-bloco" type="button" data-a="abrir-carrinho"><span id="barra-esq"></span><span id="barra-dir"></span></button>
+</div>
+<div class="veu" id="veu" hidden data-a="fechar"></div>
+<aside class="folha" id="folha" role="dialog" aria-modal="true" aria-labelledby="folha-titulo" hidden>
+<div class="folha-topo">
+<h2 id="folha-titulo"></h2>
+<button class="fechar" type="button" data-a="fechar" aria-label="Fechar">×</button>
+</div>
+<div class="folha-corpo" id="folha-corpo"></div>
+<div class="folha-pe" id="folha-pe"></div>
+</aside>
+<div class="brinde" id="brinde" role="status" aria-live="polite" hidden></div>
+<script src="app1.js"></script>
+<script src="app2.js"></script>
+<script src="app3.js"></script>
+<script src="app4.js"></script>
+<script src="app5.js"></script>
+<script src="app6.js"></script>
+<script src="app7.js"></script>
+<script src="app8.js"></script>
+<script src="app9.js"></script>
+<script src="app10.js"></script>
+<script src="app11.js"></script>
+<script src="app12.js"></script>
+<script src="app13.js"></script>
+<script src="app14.js"></script>
+<script src="app15.js"></script>
+<script src="app16.js"></script>
+<script src="app17.js"></script>
+<script src="app18.js"></script>
+<script src="app19.js"></script>
+<script src="app20.js"></script>
+<script src="app21.js"></script>
+<script src="app22.js"></script>
+<script src="app23.js"></script>
+<script src="app24.js"></script>
+<script src="app25.js"></script>
+<script src="app26.js"></script>
+<script src="app27.js"></script>
+</body>
+</html>
