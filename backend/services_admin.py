@@ -35,8 +35,16 @@ class AdminService:
         return data
 
     async def save_product(self, product_id: str | None, product: ProductIn, token: str) -> dict:
-        """Create or update a product."""
+        """Create or update a product.
+
+        When photos is sent, the first one becomes the main photo (photo_url).
+        When it is left out, the stored photos are kept as they are.
+        """
         row = product.model_dump()
+        if product.photos is None:
+            del row["photos"]
+        else:
+            row["photo_url"] = product.photos[0] if product.photos else None
         if product_id:
             return await self._tables.update("products", "id", product_id, row, token)
         row["slug"] = slugify(product.name)

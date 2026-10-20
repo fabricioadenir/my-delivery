@@ -11,7 +11,7 @@ MENU_QUERIES = {
         "select": "id,name,description,layout,sort_order,active", "deleted_at": "is.null", "order": "sort_order.asc",
     },
     "products": {
-        "select": "id,category_id,name,description,price,min_qty,pieces,photo_url,illustration,active,sort_order",
+        "select": "id,category_id,name,description,price,min_qty,pieces,photo_url,photos,illustration,active,sort_order",
         "deleted_at": "is.null", "order": "sort_order.asc,name.asc",
     },
 }

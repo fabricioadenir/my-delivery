@@ -1,5 +1,5 @@
 """Pydantic schemas for request bodies."""
-from typing import Any, Literal, Optional
+from typing import Annotated, Any, Literal, Optional
 
 from pydantic import BaseModel, Field
 
@@ -48,6 +48,7 @@ class ProductIn(BaseModel):
     min_qty: int = Field(default=1, ge=1, le=99)
     pieces: Optional[int] = Field(default=None, ge=1, le=999)
     photo_url: Optional[str] = Field(default=None, max_length=600)
+    photos: Optional[list[Annotated[str, Field(min_length=1, max_length=600)]]] = Field(default=None, max_length=12)
     active: bool = True
 
 
