@@ -5,7 +5,7 @@ from backend.supabase_client import SupabaseClient, SupabaseError
 
 MENU_QUERIES = {
     "settings": {"select": "*", "limit": "1"},
-    "opening_hours": {"select": "weekday,is_open,opens,closes", "order": "weekday.asc"},
+    "opening_hours": {"select": "weekday,is_open,opens,closes,opens2,closes2", "order": "weekday.asc"},
     "delivery_zones": {"select": "id,name,fee,min_order,sort_order", "active": "eq.true", "order": "sort_order.asc"},
     "product_categories": {
         "select": "id,name,description,layout,sort_order,active", "deleted_at": "is.null", "order": "sort_order.asc",

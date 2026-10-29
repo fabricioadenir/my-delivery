@@ -6,7 +6,7 @@ import uuid
 from datetime import datetime, timezone
 
 from backend.repositories import PhotoRepository, TableRepository
-from backend.schemas import CategoryIn, PhotoIn, ProductIn, StoreIn
+from backend.schemas import CategoryIn, HourIn, PhotoIn, ProductIn, StoreIn
 from backend.services_public import MenuService
 from backend.supabase_client import SupabaseError
 
@@ -89,18 +89,29 @@ class AdminService:
         for zone_id in current - kept:
             await self._tables.update("delivery_zones", "id", zone_id, {"active": False}, token)
 
+    @staticmethod
+    def _hour_row(hour: HourIn) -> dict:
+        """Row for opening_hours; a closed day or a missing second period is stored as nulls."""
+        second = hour.is_open and bool(hour.opens2 and hour.closes2)
+        return {
+            "weekday": hour.weekday, "is_open": hour.is_open,
+            "opens": hour.opens if hour.is_open else None, "closes": hour.closes if hour.is_open else None,
+            "opens2": hour.opens2 if second else None, "closes2": hour.closes2 if second else None,
+        }
+
     async def save_store(self, store: StoreIn, token: str) -> None:
         """Save minimum order, preparation time, opening hours and zones."""
         for hour in store.hours:
             if hour.is_open and not (hour.opens and hour.closes and hour.opens < hour.closes):
                 raise SupabaseError(400, "A hora de fecho tem de ser depois da de abertura.")
+            if hour.is_open and (hour.opens2 or hour.closes2):
+                if not (hour.opens2 and hour.closes2 and hour.opens2 < hour.closes2):
+                    raise SupabaseError(400, "No 2.º período, a hora de fecho tem de ser depois da de abertura.")
+                if not hour.closes < hour.opens2:
+                    raise SupabaseError(400, "O 2.º período tem de começar depois de o 1.º fechar.")
         settings = {"min_order": store.min_order, "prep_minutes": store.prep_minutes}
         await self._tables.update("settings", "id", "true", settings, token)
-        hours = [
-            {"weekday": h.weekday, "is_open": h.is_open,
-             "opens": h.opens if h.is_open else None, "closes": h.closes if h.is_open else None}
-            for h in store.hours
-        ]
+        hours = [self._hour_row(h) for h in store.hours]
         await self._tables.upsert("opening_hours", hours, "weekday", token)
         await self._save_zones(store, token)
 

@@ -67,12 +67,14 @@ class CategoryOrderIn(BaseModel):
 
 
 class HourIn(BaseModel):
-    """Opening hours of one weekday (0 = Sunday)."""
+    """Opening hours of one weekday (0 = Sunday); opens2/closes2 is an optional second period."""
 
     weekday: int = Field(ge=0, le=6)
     is_open: bool
     opens: Optional[str] = Field(default=None, max_length=8)
     closes: Optional[str] = Field(default=None, max_length=8)
+    opens2: Optional[str] = Field(default=None, max_length=8)
+    closes2: Optional[str] = Field(default=None, max_length=8)
 
 
 class ZoneIn(BaseModel):
