@@ -3,8 +3,8 @@
    ===================================================================== */
 const CONFIG = {
   nome: "Sakura & Sal",
-  whatsapp: "351913838543",          // número que recebe os pedidos, sem + nem espaços
-  telefoneVisivel: "913 838 543",
+  whatsapp: "351920725615",          // número que recebe os pedidos, sem + nem espaços
+  telefoneVisivel: "920 725 615",
   logoUrl: "",                        // cole aqui o logótipo (URL ou data:image/...) para substituir o desenho
   pedidoMinimo: 12,                   // em euros, sem contar a entrega
   preparoMin: 45,                     // minutos entre o pedido e a primeira entrega possível

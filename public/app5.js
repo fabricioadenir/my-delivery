@@ -28,8 +28,10 @@ async function api(caminho, opcoes = {}) {
 function mapear(d) {
   const s = d.settings || {}, horario = { 0: null, 1: null, 2: null, 3: null, 4: null, 5: null, 6: null };
   CONFIG.nome = s.business_name || CONFIG.nome;
-  CONFIG.whatsapp = s.whatsapp || CONFIG.whatsapp;
-  CONFIG.telefoneVisivel = s.phone_display || CONFIG.telefoneVisivel;
+  // o 913 838 543 deixou de ser usado: enquanto a base de dados o tiver, vale o número novo
+  const antigo = (s.whatsapp || "").replace(/\D/g, "").endsWith("913838543");
+  CONFIG.whatsapp = (!antigo && s.whatsapp) || CONFIG.whatsapp;
+  CONFIG.telefoneVisivel = (!antigo && s.phone_display) || CONFIG.telefoneVisivel;
   CONFIG.intervaloMin = s.slot_minutes || CONFIG.intervaloMin;
   if (s.payment_methods && s.payment_methods.length) CONFIG.pagamentos = s.payment_methods.map(p => p === "Dinheiro" ? "Numerário" : p);
   (d.hours || []).forEach(h => { horario[h.weekday] = h.is_open ? [h.opens.slice(0, 5), h.closes.slice(0, 5)] : null; });
