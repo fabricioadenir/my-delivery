@@ -15,7 +15,7 @@ const CONFIG = {
     { id:"vnp",   nome:"Vila Nova de Paiva", taxa:1.5 },
     { id:"satao", nome:"Sátão",              taxa:3.0 }
   ],
-  pagamentos: ["MB WAY","Dinheiro"]
+  pagamentos: ["MB WAY","Numerário"]
 };
 
 const PADRAO_LOJA = JSON.stringify({ pedidoMinimo:CONFIG.pedidoMinimo, preparoMin:CONFIG.preparoMin, horario:CONFIG.horario, zonas:CONFIG.zonas });

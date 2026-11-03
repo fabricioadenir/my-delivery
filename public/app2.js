@@ -120,7 +120,7 @@ function sincronizar(){
   const r = S.rascunho, dias = diasDisponiveis();
   $("#nova-morada").hidden = r.morada !== "nova";
   $("#agendar").hidden = r.quando !== "agendar";
-  $("#campo-troco").hidden = r.pag !== "Dinheiro";
+  $("#campo-troco").hidden = r.pag !== "Numerário";
   const dia = dias.find(d => d.chave === r.dia) || dias[0], sel = campo("hora");
   if (dia && sel) {
     if (!dia.slots.includes(r.hora)) r.hora = dia.slots[0];
@@ -169,7 +169,7 @@ function enviar(){
   const p = { num:doisD(n.d) + doisD(n.m) + "-" + doisD(n.hh) + doisD(n.mm), data:doisD(n.d) + "/" + doisD(n.m) + "/" + n.y,
     nome, tel, itens:S.cart.map(i => ({ id:i.id, q:i.q, nome:ITEM[i.id].nome, preco:ITEM[i.id].preco })),
     quando, morada:{ rua:m.rua, localidade:m.localidade, ref:m.ref || "" }, zona:z.nome,
-    acomp:ac.length ? ac.join(", ") : "Nenhum", pag:r.pag, troco:r.pag === "Dinheiro" ? r.troco.trim() : "", obs:r.obs.trim(),
+    acomp:ac.length ? ac.join(", ") : "Nenhum", pag:r.pag, troco:r.pag === "Numerário" ? r.troco.trim() : "", obs:r.obs.trim(),
     sub:subtotal(), taxa:z.taxa };
   p.texto = textoPedido(p);
   p.url = "https://wa.me/" + CONFIG.whatsapp + "?text=" + encodeURIComponent(p.texto);

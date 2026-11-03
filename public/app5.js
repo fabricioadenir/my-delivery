@@ -123,7 +123,7 @@ function corpoPedido(r, v) {
     address_street: v.morada.rua, address_locality: v.morada.localidade, address_reference: v.morada.ref || null,
     asap: r.quando === "ja", deliver_at_local: v.local || null,
     items: S.cart.map(i => ({ product_id: i.id, quantity: i.q })),
-    payment_method: r.pag, change_for: r.pag === "Dinheiro" ? r.troco.trim() || null : null,
+    payment_method: r.pag, change_for: r.pag === "Numerário" ? r.troco.trim() || null : null,
     extras: { pauzinhos: +r.pauzinhos || 0, soja: !!r.soja, wasabi: !!r.wasabi, gengibre: !!r.gengibre },
     allergy_notes: r.obs.trim() || null
   };
@@ -172,7 +172,7 @@ function concluirPedido(r, v, res) {
     num: String(res.number), data: doisD(n.d) + "/" + doisD(n.m) + "/" + n.y, nome: r.nome.trim(), tel: r.tel.trim(),
     itens: (res.items || []).map(i => ({ q: i.quantity, nome: i.name, preco: +i.unit_price })),
     quando: v.quando, morada: { rua: m.rua, localidade: m.localidade, ref: m.ref || "" }, zona: res.zone_name,
-    acomp: acompanhamentos(r), pag: r.pag, troco: r.pag === "Dinheiro" ? r.troco.trim() : "", obs: r.obs.trim(),
+    acomp: acompanhamentos(r), pag: r.pag, troco: r.pag === "Numerário" ? r.troco.trim() : "", obs: r.obs.trim(),
     sub: +res.subtotal, taxa: +res.delivery_fee
   };
   p.texto = textoPedido(p);
