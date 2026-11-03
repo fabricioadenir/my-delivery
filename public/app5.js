@@ -31,7 +31,7 @@ function mapear(d) {
   CONFIG.whatsapp = s.whatsapp || CONFIG.whatsapp;
   CONFIG.telefoneVisivel = s.phone_display || CONFIG.telefoneVisivel;
   CONFIG.intervaloMin = s.slot_minutes || CONFIG.intervaloMin;
-  if (s.payment_methods && s.payment_methods.length) CONFIG.pagamentos = s.payment_methods;
+  if (s.payment_methods && s.payment_methods.length) CONFIG.pagamentos = s.payment_methods.map(p => p === "Dinheiro" ? "Numerário" : p);
   (d.hours || []).forEach(h => { horario[h.weekday] = h.is_open ? [h.opens.slice(0, 5), h.closes.slice(0, 5)] : null; });
   return {
     categorias: (d.categories || []).map(c => ({ id: c.id, nome: c.name, desc: c.description || "", vista: c.layout === "cards" ? "cartoes" : "lista" })),
