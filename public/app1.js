@@ -2,7 +2,7 @@
    CONFIGURAÇÃO: é aqui que se muda preços, horário, zonas e contactos.
    ===================================================================== */
 const CONFIG = {
-  nome: "Sakura & Sal Sushi",
+  nome: "Sakura & Sal",
   whatsapp: "351920725615",          // número que recebe os pedidos, sem + nem espaços
   telefoneVisivel: "920 725 615",
   logoUrl: "img/logo-simbolo.png",                        // cole aqui o logótipo (URL ou data:image/...) para substituir o desenho

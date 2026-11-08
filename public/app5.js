@@ -27,8 +27,7 @@ async function api(caminho, opcoes = {}) {
  */
 function mapear(d) {
   const s = d.settings || {}, horario = { 0: null, 1: null, 2: null, 3: null, 4: null, 5: null, 6: null };
-  // o nome da marca é "Sakura & Sal Sushi": enquanto a base de dados disser só "Sakura & Sal", vale o nome completo
-  CONFIG.nome = (/^sa[ck]ura & sal$/i.test((s.business_name || "").trim()) ? "" : s.business_name) || CONFIG.nome;
+  CONFIG.nome = s.business_name || CONFIG.nome;
   // o 913 838 543 deixou de ser usado: enquanto a base de dados o tiver, vale o número novo
   const antigo = (s.whatsapp || "").replace(/\D/g, "").endsWith("913838543");
   CONFIG.whatsapp = (!antigo && s.whatsapp) || CONFIG.whatsapp;

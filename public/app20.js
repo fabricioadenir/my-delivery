@@ -7,11 +7,7 @@ document.head.insertAdjacentHTML("beforeend", `<style>
 .travessa.com-logo img{width:100%;height:100%;display:block;object-fit:cover}
 .topo .icone-btn,.topo .icone-btn svg{flex:none}
 .topo .marca{min-width:0}
-.topo .marca span{font-size:clamp(.95rem,4.3vw,1.25rem)}
-@media (max-width:479px){#btn-carrinho span:not(#conta-itens){display:none}}
-@media (max-width:419px){.topo .contido{gap:.6rem}}
-@media (max-width:359px){.topo .marca span{white-space:normal;line-height:1.1}}
-@media (min-width:860px) and (max-width:999px){.topo nav{display:none}}
+@media (max-width:419px){#btn-carrinho span:not(#conta-itens){display:none}.topo .contido{gap:.6rem}}
 </style>`);
 
 /** Mostra o logótipo no círculo da página inicial; se a imagem falhar, volta aos desenhos das peças. */
