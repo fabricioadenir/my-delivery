@@ -1,6 +1,6 @@
 :root{
 --sal:#F4F5F8; --papel:#FFFFFF; --tinta:#1A2140; --tinta-2:#555D7C; --linha:#DADDE7;
---sakura:#D63A12; --sakura-claro:#FDE5DC; --sobre-sakura:#FFFFFF; --petala:#FF7A4D;
+--sakura:#D60008; --sakura-claro:#FDE0E2; --sobre-sakura:#FFFFFF; --petala:#E8000F; --sobre-petala:#FFFFFF;
 --alga:#2A7553; --aviso:#8A4B00; --aviso-fundo:#FFF1D6;
 --noite:#1A2140; --sobre-noite:#F4F5F8; --sobre-noite-2:#B9C0DC;
 --display:"Shippori Mincho","Hiragino Mincho ProN","Yu Mincho",Georgia,serif;
@@ -12,14 +12,14 @@ padding-bottom:env(safe-area-inset-bottom,0px);
 @media (prefers-color-scheme: dark){
 :root:not([data-theme="light"]){
 --sal:#10142A; --papel:#1A2040; --tinta:#EEF0F7; --tinta-2:#A9B0CC; --linha:#2F3761;
---sakura:#FF8355; --sakura-claro:#40200F; --sobre-sakura:#2A0E05; --petala:#FF8355;
+--sakura:#FF4D5A; --sakura-claro:#4A0E14; --sobre-sakura:#2A0005; --petala:#FF4D5A; --sobre-petala:#2A0005;
 --alga:#74D3A4; --aviso:#FFD08A; --aviso-fundo:#3A2C12;
 --noite:#0A0D1E; --sobre-noite:#EEF0F7; --sobre-noite-2:#A9B0CC;
 }
 }
 :root[data-theme="dark"]{
 --sal:#10142A; --papel:#1A2040; --tinta:#EEF0F7; --tinta-2:#A9B0CC; --linha:#2F3761;
---sakura:#FF8355; --sakura-claro:#40200F; --sobre-sakura:#2A0E05; --petala:#FF8355;
+--sakura:#FF4D5A; --sakura-claro:#4A0E14; --sobre-sakura:#2A0005; --petala:#FF4D5A; --sobre-petala:#2A0005;
 --alga:#74D3A4; --aviso:#FFD08A; --aviso-fundo:#3A2C12;
 --noite:#0A0D1E; --sobre-noite:#EEF0F7; --sobre-noite-2:#A9B0CC;
 }
@@ -40,7 +40,7 @@ button{cursor:pointer}
 .topo{position:sticky;top:env(safe-area-inset-top,0px);z-index:20;background:var(--noite);color:var(--sobre-noite)}
 .topo .contido{display:flex;align-items:center;gap:1rem;min-height:64px}
 .marca{display:flex;align-items:center;gap:.6rem;text-decoration:none;margin-right:auto}
-.marca svg,.marca img{width:38px;height:38px;flex:none}
+.marca svg,.marca img{width:40px;height:40px;flex:none;border-radius:50%}
 .marca span{font-family:var(--display);font-weight:800;font-size:1.25rem;white-space:nowrap}
 .topo nav{display:none;gap:1.4rem}
 .topo nav a{text-decoration:none;color:var(--sobre-noite-2);font-weight:500}
@@ -48,7 +48,7 @@ button{cursor:pointer}
 @media (min-width:860px){.topo nav{display:flex}}
 .icone-btn{display:inline-flex;align-items:center;gap:.45rem;background:transparent;border:1.5px solid #ffffff33;color:inherit;border-radius:999px;padding:.5rem .85rem;font-weight:700;min-height:44px}
 .icone-btn svg{width:20px;height:20px}
-.icone-btn.cheio{background:var(--petala);border-color:var(--petala);color:#2A0E05}
+.icone-btn.cheio{background:var(--petala);border-color:var(--petala);color:var(--sobre-petala)}
 .icone-btn .so-largo{display:none}
 @media (min-width:560px){.icone-btn .so-largo{display:inline}}
 /* Abertura */
@@ -76,7 +76,7 @@ button{cursor:pointer}
 .btn{display:inline-flex;align-items:center;justify-content:center;gap:.5rem;min-height:48px;padding:.7rem 1.4rem;border-radius:999px;border:2px solid var(--sakura);background:var(--sakura);color:var(--sobre-sakura);font-weight:700;text-decoration:none;text-align:center}
 .btn:hover{filter:brightness(1.08)}
 .btn-sec{background:transparent;color:var(--sakura)}
-.btn-claro{background:var(--petala);border-color:var(--petala);color:#2A0E05}
+.btn-claro{background:var(--petala);border-color:var(--petala);color:var(--sobre-petala)}
 .btn-fantasma{background:transparent;border-color:#ffffff55;color:var(--sobre-noite)}
 .btn-bloco{width:100%}
 .btn[aria-disabled="true"]{opacity:.5;cursor:not-allowed;filter:none}

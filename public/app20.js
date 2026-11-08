@@ -1,6 +1,6 @@
 /* ---------- logótipo no círculo da abertura e ícone da conta no telemóvel ---------- */
-const LOGO_PARTES = ["img/logo-1.txt", "img/logo-2.txt", "img/logo-3.txt", "img/logo-4.txt"];
-let logoSrc = "", logoFalhou = false;
+const LOGO_ABERTURA = "img/logo-completo.webp";
+let logoFalhou = false;
 
 document.head.insertAdjacentHTML("beforeend", `<style>
 .travessa.com-logo{display:block;padding:0;overflow:hidden;background:#fff}
@@ -10,22 +10,18 @@ document.head.insertAdjacentHTML("beforeend", `<style>
 @media (max-width:419px){#btn-carrinho span:not(#conta-itens){display:none}.topo .contido{gap:.6rem}}
 </style>`);
 
-/**
- * Junta as partes do logótipo (imagem WebP em base64) numa só imagem.
- * @returns {Promise<string>} Endereço data: da imagem.
- */
-async function carregarLogo() {
-  const partes = await Promise.all(LOGO_PARTES.map(async u => { const r = await fetch(u); if (!r.ok) throw new Error(u); return (await r.text()).trim(); }));
-  return "data:image/webp;base64," + partes.join("");
-}
-
-/** Mostra o logótipo no círculo da página inicial (círculo branco enquanto carrega). */
+/** Mostra o logótipo no círculo da página inicial; se a imagem falhar, volta aos desenhos das peças. */
 function mostrarLogo() {
   const t = $("#travessa");
   if (logoFalhou) return;
   t.classList.add("com-logo");
   t.removeAttribute("aria-hidden");
-  t.innerHTML = logoSrc ? `<img src="${logoSrc}" alt="Logótipo Sakura & Sal Sushi" width="600" height="600">` : "";
+  t.innerHTML = `<img src="${LOGO_ABERTURA}" alt="Logótipo Sakura & Sal Sushi" width="600" height="600" decoding="async">`;
+  t.querySelector("img").addEventListener("error", () => {
+    logoFalhou = true;
+    t.classList.remove("com-logo");
+    montarPagina();
+  }, { once: true });
 }
 
 const montarSemLogo = montarPagina;
@@ -33,5 +29,3 @@ const montarSemLogo = montarPagina;
 montarPagina = function () { montarSemLogo(); mostrarLogo(); };
 
 mostrarLogo();
-carregarLogo().then(src => { logoSrc = src; mostrarLogo(); })
-  .catch(() => { logoFalhou = true; $("#travessa").classList.remove("com-logo"); montarPagina(); });

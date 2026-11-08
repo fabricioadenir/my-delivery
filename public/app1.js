@@ -5,7 +5,7 @@ const CONFIG = {
   nome: "Sakura & Sal",
   whatsapp: "351920725615",          // número que recebe os pedidos, sem + nem espaços
   telefoneVisivel: "920 725 615",
-  logoUrl: "",                        // cole aqui o logótipo (URL ou data:image/...) para substituir o desenho
+  logoUrl: "img/logo-simbolo.png",                        // cole aqui o logótipo (URL ou data:image/...) para substituir o desenho
   pedidoMinimo: 12,                   // em euros, sem contar a entrega
   preparoMin: 45,                     // minutos entre o pedido e a primeira entrega possível
   intervaloMin: 30,                   // intervalo entre horas de entrega
@@ -105,7 +105,7 @@ function arte(t){
   }
   return a + f;
 }
-const FLOR = `<svg viewBox="0 0 64 64" aria-hidden="true" focusable="false">${[0,72,144,216,288].map(g => `<path transform="rotate(${g} 32 32)" d="M32 31C23 22 24 9 29.500 5l2.500 3 2.500-3C40 9 41 22 32 31z" fill="#FF6A3D"/>`).join("")}<rect x="27.500" y="27.500" width="9" height="9" rx="1.500" transform="rotate(45 32 32)" fill="#fff"/></svg>`;
+const FLOR = `<svg viewBox="0 0 64 64" aria-hidden="true" focusable="false">${[0,72,144,216,288].map(g => `<path transform="rotate(${g} 32 32)" d="M32 31C23 22 24 9 29.500 5l2.500 3 2.500-3C40 9 41 22 32 31z" fill="#E8000F"/>`).join("")}<rect x="27.500" y="27.500" width="9" height="9" rx="1.500" transform="rotate(45 32 32)" fill="#fff"/></svg>`;
 
 /* ---------- tempo (hora de Portugal continental) ---------- */
 function agora(){
@@ -176,7 +176,7 @@ function montarPagina(){
   $("#travessa").innerHTML = ["nigiri","ura-salmao","maki-salmao","hot","gunkan","ura-california"].map(arte).join("");
   $("#petalas").innerHTML = [[8,60,520,200],[22,-40,430,-160],[41,90,600,260],[63,-70,380,140],[78,30,560,-220],[92,-90,470,300]].map((p, i) =>
     `<svg class="petala" viewBox="0 0 24 24" style="left:${p[0]}%;--dx:${p[1]}px;--dy:${p[2]}px;--rot:${p[3]}deg;animation-delay:${i * 0.5}s"><path d="M12 2C18 8 20 15 12 22 4 15 6 8 12 2z"/></svg>`).join("");
-  $("#f-zonas").textContent = CONFIG.zonas.map(z => z.nome).join(", ").replace(/, ([^,]*)$/, " e $1");
+  $("#f-zonas").textContent = "Vila Nova de Paiva e arredores";
   $("#f-min").textContent = eur(CONFIG.pedidoMinimo);
   const cats = D.categorias.map(c => ({ c, ps:D.produtos.filter(p => p.cat === c.id && p.ativo !== false) })).filter(x => x.ps.length);
   $("#nav").innerHTML = cats.map(x => `<a href="#cat-${esc(x.c.id)}">${esc(x.c.nome)}</a>`).join("") + `<a href="#horario">Horário</a>`;
