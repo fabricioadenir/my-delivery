@@ -1,7 +1,7 @@
 """HTTP routes for the Raio-X: public event intake and the staff summary."""
 import json
 
-from fastapi import APIRouter, Depends, Query, Request
+from fastapi import APIRouter, BackgroundTasks, Depends, Query, Request
 
 from backend.container import container
 from backend.routes_admin import staff_token
@@ -13,7 +13,7 @@ MAX_BODY = 32_000
 
 
 @public_router.post("/events")
-async def record_events(request: Request) -> dict:
+async def record_events(request: Request, background: BackgroundTasks) -> dict:
     """Receive a batch of anonymous visitor events (also sent with navigator.sendBeacon)."""
     raw = await request.body()
     if len(raw) > MAX_BODY:
@@ -23,7 +23,10 @@ async def record_events(request: Request) -> dict:
     except ValueError:
         return {"ok": False}
     events = body.get("events") if isinstance(body, dict) else None
-    saved = await container.insights.record(events, {k.lower(): v for k, v in request.headers.items()})
+    headers = {k.lower(): v for k, v in request.headers.items()}
+    saved = await container.insights.record(events, headers)
+    if saved:
+        background.add_task(container.push.visit_events, container.insights.with_place(events, headers))
     return {"ok": True, "saved": saved}
 
 

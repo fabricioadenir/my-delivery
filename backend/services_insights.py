@@ -24,6 +24,11 @@ class InsightsService:
         value = headers.get(name)
         return unquote(value)[:60] if value else None
 
+    def with_place(self, events: list, headers: dict) -> list:
+        """Return the events with the approximate city on the visit, as they were saved."""
+        city = self._header(headers, "x-vercel-ip-city")
+        return [dict(e, city=city) if isinstance(e, dict) and e.get("type") == "visita" else e for e in events[:MAX_EVENTS]]
+
     async def record(self, events: Any, headers: dict) -> int:
         """Save a batch of events; the approximate city comes from the network, never from the visitor."""
         if not isinstance(events, list) or BOT_PATTERN.search(headers.get("user-agent", "")):

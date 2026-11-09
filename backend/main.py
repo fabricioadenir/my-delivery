@@ -12,6 +12,7 @@ from backend.routes_insights import public_router as insights_public_router
 from backend.routes_ops import admin_router as ops_admin_router
 from backend.routes_ops import public_router as ops_public_router
 from backend.routes_public import router as public_router
+from backend.routes_push import router as push_router
 from backend.routes_stock import router as stock_router
 from backend.supabase_client import SupabaseError
 
@@ -37,6 +38,7 @@ def create_app() -> FastAPI:
     application.include_router(ops_admin_router)
     application.include_router(insights_public_router)
     application.include_router(insights_admin_router)
+    application.include_router(push_router)
     return application
 
 

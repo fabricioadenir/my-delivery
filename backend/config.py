@@ -11,6 +11,13 @@ class Config:
         self.supabase_key: str = os.environ.get("SUPABASE_KEY", "")
         self.photo_bucket: str = os.environ.get("PHOTO_BUCKET", "fotos")
         self.timeout_seconds: float = float(os.environ.get("SUPABASE_TIMEOUT", "20"))
+        self.vapid_private_key: str = os.environ.get("VAPID_PRIVATE_KEY", "")
+        self.vapid_subject: str = os.environ.get("VAPID_SUBJECT", "https://sakuraesalsushi.pt")
+        self.push_secret: str = os.environ.get("PUSH_SECRET", "")
+
+    def push_ready(self) -> bool:
+        """Tell whether the Web Push keys are present."""
+        return bool(self.vapid_private_key and self.push_secret)
 
     def is_ready(self) -> bool:
         """Tell whether the Supabase connection settings are present."""

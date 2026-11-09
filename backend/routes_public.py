@@ -1,5 +1,5 @@
 """Public HTTP routes: menu, orders and authentication."""
-from fastapi import APIRouter
+from fastapi import APIRouter, BackgroundTasks
 
 from backend.container import container
 from backend.schemas import CredentialsIn, OrderIn
@@ -20,9 +20,11 @@ async def menu() -> dict:
 
 
 @router.post("/orders")
-async def create_order(order: OrderIn) -> dict:
-    """Register an order sent by the public site."""
-    return await container.orders.create(order)
+async def create_order(order: OrderIn, background: BackgroundTasks) -> dict:
+    """Register an order sent by the public site and notify the staff phones."""
+    result = await container.orders.create(order)
+    background.add_task(container.push.new_order, result, order.customer_name, order.address_locality)
+    return result
 
 
 @router.get("/auth/status")

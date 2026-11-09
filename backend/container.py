@@ -5,6 +5,7 @@ from backend.services_admin import AdminService
 from backend.services_costing import CostingService
 from backend.services_finance import FinanceService
 from backend.services_insights import InsightsService
+from backend.services_push import PushService
 from backend.services_ops import OperationsService, SessionService
 from backend.services_public import AuthService, MenuService, OrderService
 from backend.services_stock import StockService
@@ -16,7 +17,8 @@ class Container:
 
     def __init__(self) -> None:
         """Build the object graph once per function instance."""
-        client = SupabaseClient(Config())
+        config = Config()
+        client = SupabaseClient(config)
         tables = TableRepository(client)
         self.menu = MenuService(tables)
         self.orders = OrderService(tables)
@@ -28,6 +30,7 @@ class Container:
         self.sessions = SessionService(client, tables)
         self.operations = OperationsService(tables)
         self.insights = InsightsService(tables)
+        self.push = PushService(tables, config)
 
 
 container = Container()
