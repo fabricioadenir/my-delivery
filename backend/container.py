@@ -4,6 +4,7 @@ from backend.repositories import AuthRepository, PhotoRepository, TableRepositor
 from backend.services_admin import AdminService
 from backend.services_costing import CostingService
 from backend.services_finance import FinanceService
+from backend.services_insights import InsightsService
 from backend.services_ops import OperationsService, SessionService
 from backend.services_public import AuthService, MenuService, OrderService
 from backend.services_stock import StockService
@@ -26,6 +27,7 @@ class Container:
         self.finance = FinanceService(tables)
         self.sessions = SessionService(client, tables)
         self.operations = OperationsService(tables)
+        self.insights = InsightsService(tables)
 
 
 container = Container()
