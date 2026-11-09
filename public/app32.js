@@ -115,6 +115,7 @@ function vRaioX() {
         <h3 style="margin-top:1rem">Mais pedidos (pedidos reais)</h3>${rxBarras(d.mais_pedidos, x => x.nome, "quantidade", x => `<small style="font-weight:400;color:var(--tinta-2)">${eur(+x.total)}</small>`)}</div>
       <div class="grupo"><h3>Carrinhos abandonados</h3>${rxAbandonados(d.abandonados)}<p class="rx-nota">Visitas que juntaram produtos e não enviaram o pedido. Sem nome nem contacto: o site não sabe quem são.</p></div>
       <div class="grupo"><h3>Este aparelho</h3><p class="rx-nota" style="margin-top:0">${contar ? "As visitas deste aparelho estão a contar." : "Este aparelho não conta nas estatísticas (entrou na gestão)."}</p>
+        <p class="rx-nota">Noutros aparelhos teus (ou da família) sem entrar na gestão: abre neles sakuraesalsushi.pt/?naocontar. Para voltar a contar: ?contar.</p>
         <p style="margin-top:.6rem"><button type="button" class="btn btn-sec" data-a="rx-contar">${contar ? "Não contar este aparelho" : "Voltar a contar este aparelho"}</button></p></div>` };
 }
 

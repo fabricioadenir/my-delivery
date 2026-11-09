@@ -7,9 +7,22 @@ const RX = { fila: [], vistas: new Set(), tempo: null, sessao: null, observador:
 
 /** Diz se este aparelho deve ficar de fora (equipa, robôs). */
 function rxIgnorar() {
+  rxMarcarPorLigacao();
   // quem entra na gestão fica marcado uma vez; depois pode voltar a contar no Raio-X
   if (LS.get("token", null) && !LS.get("equipaMarcada", false)) { LS.set("equipaMarcada", true); LS.set("naoContar", true); }
   return LS.get("naoContar", false) || navigator.webdriver === true;
+}
+
+/** sakuraesalsushi.pt/?naocontar marca o aparelho como da equipa; ?contar desfaz. Tira o parâmetro do endereço. */
+function rxMarcarPorLigacao() {
+  if (RX.ligacaoVista) return;
+  RX.ligacaoVista = true;
+  const q = new URLSearchParams(location.search), marcar = q.has("naocontar"), desmarcar = q.has("contar");
+  if (!marcar && !desmarcar) return;
+  LS.set("naoContar", marcar);
+  q.delete("naocontar"); q.delete("contar");
+  try { history.replaceState(null, "", location.pathname + (q.toString() ? "?" + q : "") + location.hash); } catch (e) {}
+  setTimeout(() => brinde(marcar ? "Este aparelho já não conta no Raio-X" : "Este aparelho volta a contar no Raio-X"), 800);
 }
 
 /** Código da visita: novo a cada separador aberto. */
