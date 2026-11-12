@@ -38,9 +38,11 @@ class AdminService:
         """Create or update a product.
 
         When photos is sent, the first one becomes the main photo (photo_url).
-        When it is left out, the stored photos are kept as they are.
+        When it is left out, the stored photos are kept as they are (same for temp_option).
         """
         row = product.model_dump()
+        if product.temp_option is None:
+            del row["temp_option"]
         if product.photos is None:
             del row["photos"]
         else:

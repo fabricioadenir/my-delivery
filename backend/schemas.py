@@ -11,6 +11,7 @@ class OrderItemIn(BaseModel):
 
     product_id: str
     quantity: int = Field(ge=1, le=99)
+    option: Optional[Literal["Fresca", "Natural"]] = None
 
 
 class OrderIn(BaseModel):
@@ -50,6 +51,7 @@ class ProductIn(BaseModel):
     photo_url: Optional[str] = Field(default=None, max_length=600)
     photos: Optional[list[Annotated[str, Field(min_length=1, max_length=600)]]] = Field(default=None, max_length=12)
     active: bool = True
+    temp_option: Optional[bool] = None
 
 
 class CategoryIn(BaseModel):
