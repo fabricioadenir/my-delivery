@@ -269,6 +269,7 @@ revoke all on function public.client_signup(jsonb), public.client_login(text, te
   public.client_update(text, jsonb), public.client_change_pin(text, text, text), public.client_logout(text),
   public.client_delete(text), public.client_attach_order(text, uuid), public.client_recover_info(text),
   public.client_recover(text, text), public.client_accounts_staff() from public;
+revoke execute on function public.client_accounts_staff() from anon;
 grant execute on function public.client_signup(jsonb), public.client_login(text, text), public.client_me(text),
   public.client_update(text, jsonb), public.client_change_pin(text, text, text), public.client_logout(text),
   public.client_delete(text), public.client_attach_order(text, uuid), public.client_recover_info(text),
