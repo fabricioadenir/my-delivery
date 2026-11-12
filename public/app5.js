@@ -4,13 +4,15 @@ const API = "/api";
 /**
  * Chama o backend e devolve o JSON da resposta.
  * @param {string} caminho Caminho depois de /api.
- * @param {{method?:string, body?:object, auth?:boolean}} opcoes Método, corpo e se envia a sessão.
+ * @param {{method?:string, body?:object, auth?:boolean, cliente?:boolean}} opcoes Método, corpo, se envia a sessão da gestão e se envia a sessão do cliente.
  * @returns {Promise<any>} Resposta do servidor.
  */
 async function api(caminho, opcoes = {}) {
   const cab = { "Content-Type": "application/json" };
   const token = opcoes.auth ? LS.get("token", null) : null;
   if (token) cab.Authorization = "Bearer " + token;
+  const cliente = opcoes.cliente ? LS.get("cliente", null) : null;
+  if (cliente) cab["X-Cliente"] = cliente;
   const r = await fetch(API + caminho, { method: opcoes.method || "GET", headers: cab, body: opcoes.body ? JSON.stringify(opcoes.body) : undefined });
   let d = null;
   try { d = await r.json(); } catch (e) { d = null; }
@@ -191,7 +193,7 @@ async function enviar() {
   if (v.erros.length) return falhar(v.erros);
   if (botao.getAttribute("aria-disabled") === "true") return;
   botao.setAttribute("aria-disabled", "true"); botao.textContent = "A registar o pedido…";
-  try { concluirPedido(r, v, await api("/orders", { method: "POST", body: corpoPedido(r, v) })); }
+  try { concluirPedido(r, v, await api("/orders", { method: "POST", body: corpoPedido(r, v), cliente: true })); }
   catch (e) {
     botao.setAttribute("aria-disabled", "false"); botao.textContent = "Enviar pedido pelo WhatsApp";
     falhar([e.message]);

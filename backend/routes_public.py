@@ -1,5 +1,7 @@
 """Public HTTP routes: menu, orders and authentication."""
-from fastapi import APIRouter, BackgroundTasks
+from typing import Optional
+
+from fastapi import APIRouter, BackgroundTasks, Header
 
 from backend.container import container
 from backend.schemas import CredentialsIn, OrderIn
@@ -20,9 +22,14 @@ async def menu() -> dict:
 
 
 @router.post("/orders")
-async def create_order(order: OrderIn, background: BackgroundTasks) -> dict:
-    """Register an order sent by the public site and notify the staff phones."""
+async def create_order(order: OrderIn, background: BackgroundTasks, x_cliente: Optional[str] = Header(default=None)) -> dict:
+    """Register an order sent by the public site and notify the staff phones.
+
+    With a customer session (header X-Cliente) the order is also linked to the saved data,
+    so it shows up in "Os meus pedidos" on any device.
+    """
     result = await container.orders.create(order)
+    result["saved"] = await container.clients.attach_order(x_cliente, result.get("id"))
     background.add_task(container.push.new_order, result, order.customer_name, order.address_locality)
     return result
 

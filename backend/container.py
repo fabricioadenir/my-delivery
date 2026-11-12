@@ -2,6 +2,7 @@
 from backend.config import Config
 from backend.repositories import AuthRepository, PhotoRepository, TableRepository
 from backend.services_admin import AdminService
+from backend.services_clients import ClientService
 from backend.services_costing import CostingService
 from backend.services_finance import FinanceService
 from backend.services_insights import InsightsService
@@ -31,6 +32,7 @@ class Container:
         self.operations = OperationsService(tables)
         self.insights = InsightsService(tables)
         self.push = PushService(tables, config)
+        self.clients = ClientService(tables)
 
 
 container = Container()

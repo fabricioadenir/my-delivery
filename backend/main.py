@@ -5,6 +5,8 @@ from fastapi import FastAPI, Request
 from fastapi.responses import JSONResponse
 
 from backend.routes_admin import router as admin_router
+from backend.routes_clients import admin_router as clients_admin_router
+from backend.routes_clients import router as clients_router
 from backend.routes_costing import router as costing_router
 from backend.routes_finance import router as finance_router
 from backend.routes_insights import admin_router as insights_admin_router
@@ -39,6 +41,8 @@ def create_app() -> FastAPI:
     application.include_router(insights_public_router)
     application.include_router(insights_admin_router)
     application.include_router(push_router)
+    application.include_router(clients_router)
+    application.include_router(clients_admin_router)
     return application
 
 
