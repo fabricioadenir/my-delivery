@@ -34,7 +34,7 @@ function lerDefinicoes() {
  */
 function vEnviado() {
   const p = S.ultimo;
-  return { titulo: "Pedido n.º " + p.num + " registado",
+  return { titulo: "Pedido " + p.num + " registado",
     corpo: `<p>O seu pedido ficou registado. Para o confirmarmos, envie-o agora pelo WhatsApp.</p>
       <div class="pilha" style="margin-top:1rem"><a class="btn btn-zap btn-bloco" href="${esc(p.url)}" target="_blank" rel="noopener">Enviar pelo WhatsApp</a></div>
       <pre class="msg" id="msg">${esc(p.texto)}</pre>

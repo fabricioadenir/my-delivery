@@ -173,7 +173,7 @@ function guardarNoDispositivo(r, m, p) {
 function concluirPedido(r, v, res) {
   const n = agora(), m = v.morada;
   const p = {
-    num: String(res.number), data: doisD(n.d) + "/" + doisD(n.m) + "/" + n.y, nome: r.nome.trim(), tel: r.tel.trim(),
+    num: String(res.code || res.number), data: doisD(n.d) + "/" + doisD(n.m) + "/" + n.y, nome: r.nome.trim(), tel: r.tel.trim(),
     itens: (res.items || []).map(i => ({ q: i.quantity, nome: i.name, preco: +i.unit_price })),
     quando: v.quando, morada: { rua: m.rua, localidade: m.localidade, ref: m.ref || "" }, zona: res.zone_name,
     acomp: acompanhamentos(r), pag: r.pag, troco: r.pag === "Numerário" ? r.troco.trim() : "", obs: r.obs.trim(),

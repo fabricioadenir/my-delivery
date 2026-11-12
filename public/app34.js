@@ -44,7 +44,7 @@ function aplicarConta(c) {
   if (!c) return;
   S.perfil = { nome: c.nome, tel: telBonito(c.tel) };
   S.moradas = arr(c.moradas);
-  S.pedidos = arr(c.pedidos).map(o => ({ id: o.id, num: String(o.number), data: diaPt(o.created_at), itens: arr(o.itens), total: +o.total }));
+  S.pedidos = arr(c.pedidos).map(o => ({ id: o.id, num: String(o.code || o.number), data: diaPt(o.created_at), itens: arr(o.itens), total: +o.total }));
   arr(c.pedidos).forEach(o => { estadosCliente[o.id] = o.status; });
   LS.set("perfil", S.perfil); LS.set("moradas", S.moradas); LS.set("pedidos", S.pedidos);
   if (S.rascunho && !S.rascunho.nome) S.rascunho.nome = S.perfil.nome;

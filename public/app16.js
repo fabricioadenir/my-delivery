@@ -89,7 +89,7 @@ function tocarAviso() {
  */
 function contactosPedido(p) {
   const d = String(p.customer_phone).replace(/\D/g, ""), tel = d.length === 9 ? "351" + d : d;
-  const msg = `Olá ${String(p.customer_name).split(" ")[0]}, ${AVISO_CLIENTE[p.status]} (n.º ${p.number}). ${CONFIG.nome}`;
+  const msg = `Olá ${String(p.customer_name).split(" ")[0]}, ${AVISO_CLIENTE[p.status]} (pedido ${p.public_code || p.number}). ${CONFIG.nome}`;
   const mapa = "https://www.google.com/maps/search/?api=1&query=" + encodeURIComponent(p.address_street + ", " + p.address_locality);
   return `<p class="adm-acoes"><a class="ligacao" href="tel:${esc(p.customer_phone)}">Ligar</a><a class="ligacao" href="https://wa.me/${tel}?text=${encodeURIComponent(msg)}" target="_blank" rel="noopener">Avisar pelo WhatsApp</a><a class="ligacao" href="${esc(mapa)}" target="_blank" rel="noopener">Abrir no mapa</a></p>`;
 }
@@ -102,7 +102,7 @@ function contactosPedido(p) {
 function cartaoOperacao(p) {
   const itens = (p.order_items || []).map(i => i.quantity + "x " + esc(i.product_name)).join(", "), prox = PROXIMO[p.status];
   const custo = p.cost_total == null ? "" : `<p style="color:var(--tinta-2)">Custo de produção ${eur(+p.cost_total)}, sobram ${eur(p.subtotal - p.cost_total)} antes da entrega.</p>`;
-  return `<div class="grupo"><h3>N.º ${p.number}<span class="etiqueta">${ESTADOS[p.status]}</span></h3>
+  return `<div class="grupo"><h3>N.º ${p.number}${p.public_code ? ` <small style="font-weight:600;color:var(--tinta-2)">· ${esc(p.public_code)}</small>` : ""}<span class="etiqueta">${ESTADOS[p.status]}</span></h3>
     <p><strong>Entrega: ${p.asap ? "o mais cedo possível" : fmtData(p.deliver_at)}</strong></p>
     <p>${esc(p.customer_name)}, ${esc(p.customer_phone)}</p>${contactosPedido(p)}
     <p>${esc(p.address_street)}, ${esc(p.address_locality)} (${esc(p.zone_name)})${p.address_reference ? ". " + esc(p.address_reference) : ""}</p>

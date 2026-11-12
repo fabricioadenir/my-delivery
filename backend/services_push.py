@@ -81,7 +81,7 @@ class PushService:
         body = f"{customer.split()[0] if customer else 'Cliente'} · {total:.2f} €".replace(".", ",")
         if locality or order.get("zone_name"):
             body += f" · {locality or order['zone_name']}"
-        await self.notify("orders", f"Novo pedido n.º {order.get('number', '')}", body, "/?abrir=pedidos", "high")
+        await self.notify("orders", f"Novo pedido n.º {order.get('number', '')}" + (f" · {order['code']}" if order.get("code") else ""), body, "/?abrir=pedidos", "high")
 
     async def save(self, data: dict, token: str) -> dict:
         """Save this device's subscription and preferences."""

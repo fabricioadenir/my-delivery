@@ -42,6 +42,10 @@ $(".topo").insertAdjacentHTML("afterend", `<button type="button" id="faixa-pedid
 async function consultarPedidos(ids) {
   const lista = await apiSemIndicador("/orders/status", { method: "POST", body: { ids } });
   lista.forEach(o => { rastos[o.id] = o; estadosCliente[o.id] = o.status; });
+  // o cliente vê o código do pedido, não o n.º sequencial (pedidos antigos guardados com o n.º passam ao código)
+  let mudou = false;
+  S.pedidos.forEach(p => { const o = p.id && rastos[p.id]; if (o && o.code && p.num !== o.code) { p.num = o.code; mudou = true; } });
+  if (mudou) LS.set("pedidos", S.pedidos);
   ultimaConsulta = Date.now();
   return lista;
 }
@@ -92,7 +96,7 @@ function vAcompanhar() {
   if (!o) return { titulo: "Acompanhar pedido", corpo: `<div class="rasto-topo" role="status"><p>${seguir.falha ? "Não foi possível consultar o pedido. Verifique a ligação à internet." : seguir.visto ? "Não encontrámos este pedido." : "A procurar o seu pedido…"}</p></div>
     <div class="pilha">${seguir.visto || seguir.falha ? `<button type="button" class="btn btn-bloco" data-a="rasto-atualizar">Tentar de novo</button>` : ""}${zap}${voltar}</div>` };
   const hora = new Date(ultimaConsulta).toLocaleTimeString("pt-PT", { hour: "2-digit", minute: "2-digit" });
-  return { titulo: "Pedido n.º " + o.number,
+  return { titulo: "Pedido " + (o.code || o.number),
     corpo: `<div class="rasto-topo" role="status" aria-live="polite"><p class="grande">${ESTADOS[o.status]}</p><p>${FRASE[o.status]}</p>${o.status === "cancelled" || o.status === "delivered" ? "" : `<p>${esc(textoEntrega(o))}</p>`}</div>
       ${o.status === "cancelled" ? "" : `<div class="grupo">${passosHtml(o.status)}</div>`}
       <p class="nota" style="text-align:center;margin:0 0 1rem">${emCurso(o.id) ? "Esta página atualiza-se sozinha. " : ""}Visto às ${hora}.${seguir.falha ? " Sem ligação, a tentar de novo." : ""}</p>
@@ -133,7 +137,7 @@ function mostrarFaixa() {
   f.hidden = !p;
   if (!p) return;
   f.dataset.id = p.id;
-  f.innerHTML = `<span>Pedido n.º ${esc(p.num)}: ${ESTADOS[rastos[p.id].status]}</span><u>Acompanhar</u>`;
+  f.innerHTML = `<span>Pedido ${esc(p.num)}: ${ESTADOS[rastos[p.id].status]}</span><u>Acompanhar</u>`;
 }
 
 /** Atualiza o estado dos pedidos recentes para a faixa do topo. */

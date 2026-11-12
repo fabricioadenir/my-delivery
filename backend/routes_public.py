@@ -30,7 +30,9 @@ async def create_order(order: OrderIn, background: BackgroundTasks, x_cliente: O
     """
     result = await container.orders.create(order)
     result["saved"] = await container.clients.attach_order(x_cliente, result.get("id"))
-    background.add_task(container.push.new_order, result, order.customer_name, order.address_locality)
+    background.add_task(container.push.new_order, dict(result), order.customer_name, order.address_locality)
+    if result.get("code"):
+        result.pop("number", None)   # o cliente só vê o código, não quantos pedidos a loja já teve
     return result
 
 

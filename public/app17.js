@@ -135,7 +135,7 @@ const vContaBase = VISTAS.conta;
  */
 function vContaComEstado() {
   const v = vContaBase();
-  S.pedidos.forEach(p => { if (p.id && estadosCliente[p.id]) v.corpo = v.corpo.replace(`<strong>N.º ${esc(p.num)}</strong>`, `<strong>N.º ${esc(p.num)}</strong><span class="etiqueta">${ESTADOS[estadosCliente[p.id]]}</span>`); });
+  S.pedidos.forEach(p => { if (p.id && estadosCliente[p.id]) v.corpo = v.corpo.replace(`<strong>Pedido ${esc(p.num)}</strong>`, `<strong>Pedido ${esc(p.num)}</strong><span class="etiqueta">${ESTADOS[estadosCliente[p.id]]}</span>`); });
   return v;
 }
 

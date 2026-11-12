@@ -132,7 +132,7 @@ function sincronizar(){
 
 function textoPedido(p){
   const L = [];
-  L.push("*NOVO PEDIDO | " + CONFIG.nome + "*", "Pedido n.º " + p.num, "");
+  L.push("*NOVO PEDIDO | " + CONFIG.nome + "*", "Pedido " + p.num, "");
   L.push("*Cliente*", "Nome: " + p.nome, "Telemóvel: " + p.tel, "");
   L.push("*Itens*");
   p.itens.forEach(i => L.push(i.q + "x " + i.nome + " ...... " + eur(i.preco * i.q)));
@@ -207,7 +207,7 @@ function vConta(){
     pe:`<button type="button" class="btn btn-bloco" data-a="guardar-perfil">Guardar e entrar</button>` };
   const moradas = S.moradas.length ? S.moradas.map(m => `<div class="cartao"><div><strong>${esc(m.rotulo || "Morada")}</strong>${m.padrao ? `<span class="etiqueta">Principal</span>` : ""}<small>${esc(m.rua)}, ${esc(m.localidade)} (${esc(ZONA[m.zona] ? ZONA[m.zona].nome : "")})</small></div>
       <div class="acoes">${m.padrao ? "" : `<button type="button" class="ligacao" data-a="morada-principal" data-id="${m.id}">Tornar principal</button>`}<button type="button" class="ligacao" data-a="morada-editar" data-id="${m.id}">Editar</button><button type="button" class="ligacao" data-a="morada-apagar" data-id="${m.id}">Apagar</button></div></div>`).join("") : `<p style="color:var(--tinta-2)">Ainda não guardou nenhuma morada.</p>`;
-  const pedidos = S.pedidos.length ? S.pedidos.map((p, i) => `<div class="cartao"><div><strong>N.º ${esc(p.num)}</strong><small>${esc(p.data)}, ${eur(p.total)}</small><small>${p.itens.map(x => x.q + "x " + esc(x.nome)).join(", ")}</small></div><div class="acoes"><button type="button" class="ligacao" data-a="repetir" data-i="${i}">Pedir de novo</button></div></div>`).join("") : `<p style="color:var(--tinta-2)">Os pedidos que enviar aparecem aqui.</p>`;
+  const pedidos = S.pedidos.length ? S.pedidos.map((p, i) => `<div class="cartao"><div><strong>Pedido ${esc(p.num)}</strong><small>${esc(p.data)}, ${eur(p.total)}</small><small>${p.itens.map(x => x.q + "x " + esc(x.nome)).join(", ")}</small></div><div class="acoes"><button type="button" class="ligacao" data-a="repetir" data-i="${i}">Pedir de novo</button></div></div>`).join("") : `<p style="color:var(--tinta-2)">Os pedidos que enviar aparecem aqui.</p>`;
   return { titulo:"A sua conta",
     corpo:`<div class="grupo"><h3>Os seus dados</h3>
         <label class="campo"><span>Nome</span><input type="text" name="nome" value="${esc(S.perfil.nome)}" autocomplete="name"></label>
