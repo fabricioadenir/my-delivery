@@ -6,7 +6,7 @@ import uuid
 from datetime import datetime, timezone
 
 from backend.repositories import PhotoRepository, TableRepository
-from backend.schemas import CategoryIn, HourIn, PhotoIn, ProductIn, StoreIn
+from backend.schemas import CategoryIn, HourIn, PhotoIn, ProductIn, StaffOrderIn, StoreIn
 from backend.services_public import MenuService
 from backend.supabase_client import SupabaseError
 
@@ -52,6 +52,12 @@ class AdminService:
         row["slug"] = slugify(product.name)
         row["sort_order"] = 999
         return await self._tables.insert("products", row, token)
+
+    async def create_external_order(self, order: StaffOrderIn, token: str) -> dict:
+        """Register an order that arrived by WhatsApp, phone or in person."""
+        payload = order.model_dump()
+        payload["change_for"] = (order.change_for or "").strip() or None
+        return await self._tables.rpc("create_order_staff", {"p": payload}, token)
 
     async def save_category(self, category_id: str | None, category: CategoryIn, token: str) -> dict:
         """Create or update a category."""

@@ -4,7 +4,7 @@ from typing import Optional
 from fastapi import APIRouter, Depends, Header
 
 from backend.container import container
-from backend.schemas import CategoryIn, CategoryOrderIn, PhotoIn, ProductIn, StatusIn, StoreIn
+from backend.schemas import CategoryIn, CategoryOrderIn, PhotoIn, ProductIn, StaffOrderIn, StatusIn, StoreIn
 from backend.supabase_client import SupabaseError
 
 
@@ -90,6 +90,12 @@ async def save_store(store: StoreIn, token: str = Depends(staff_token)) -> dict:
 async def upload_photo(photo: PhotoIn, token: str = Depends(staff_token)) -> dict:
     """Upload a product photo."""
     return await container.admin.upload_photo(photo, token)
+
+
+@router.post("/orders")
+async def create_external_order(order: StaffOrderIn, token: str = Depends(staff_token)) -> dict:
+    """Register an order that arrived outside the site (same numbering, stock and reports)."""
+    return await container.admin.create_external_order(order, token)
 
 
 @router.patch("/orders/{order_id}")

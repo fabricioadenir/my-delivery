@@ -32,6 +32,15 @@ class OrderIn(BaseModel):
     allergy_notes: Optional[str] = Field(default=None, max_length=1000)
 
 
+class StaffOrderIn(OrderIn):
+    """Order that arrived outside the site (WhatsApp, phone, in person), registered by the staff."""
+
+    channel: Literal["whatsapp", "telefone", "presencial", "outro"] = "whatsapp"
+    discount: float = Field(default=0, ge=0, le=9999)
+    notes: Optional[str] = Field(default=None, max_length=1000)
+    items: list[OrderItemIn] = Field(min_length=1, max_length=80)
+
+
 class CredentialsIn(BaseModel):
     """Email and password of a staff account."""
 
