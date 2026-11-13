@@ -195,7 +195,7 @@ async function enviar() {
   botao.setAttribute("aria-disabled", "true"); botao.textContent = "A registar o pedido…";
   try { concluirPedido(r, v, await api("/orders", { method: "POST", body: corpoPedido(r, v), cliente: true })); }
   catch (e) {
-    botao.setAttribute("aria-disabled", "false"); botao.textContent = "Enviar pedido pelo WhatsApp";
+    botao.setAttribute("aria-disabled", "false"); botao.textContent = "Fazer pedido";
     falhar([e.message]);
   }
 }
