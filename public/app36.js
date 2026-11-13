@@ -11,7 +11,7 @@ document.head.insertAdjacentHTML("beforeend", `<style>
 .man-quando{display:grid;grid-template-columns:1fr 1fr;gap:.6rem}
 </style>`);
 
-const ORIGENS = { whatsapp: "WhatsApp", telefone: "Telefone", presencial: "Presencial", outro: "Outro" };
+const ORIGENS = { whatsapp: "WhatsApp", instagram: "Instagram", telefone: "Telefone", presencial: "Presencial", outro: "Outro" };
 let manual = null;
 
 /** Pedido em branco para o formulário. */
