@@ -21,6 +21,12 @@ async def menu() -> dict:
     return await container.menu.menu()
 
 
+@router.get("/blocked-times")
+async def blocked_times() -> list:
+    """Return the delivery times already taken (15 minutes around each order) so the site hides them."""
+    return await container.menu.blocked_times()
+
+
 @router.post("/orders")
 async def create_order(order: OrderIn, background: BackgroundTasks, x_cliente: Optional[str] = Header(default=None)) -> dict:
     """Register an order sent by the public site and notify the staff phones.

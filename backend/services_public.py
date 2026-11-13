@@ -1,5 +1,6 @@
 """Business logic for the public site and for authentication."""
 import asyncio
+from datetime import datetime, timedelta, timezone
 import logging
 import re
 from typing import Optional
@@ -23,6 +24,15 @@ class MenuService:
     def __init__(self, tables: TableRepository) -> None:
         """Keep the table repository."""
         self._tables = tables
+
+    async def blocked_times(self) -> list:
+        """Return the delivery time ranges already taken in the next 8 days (local "from"/"to", exclusive).
+
+        Only ranges are exposed, never orders or counts, so the site can hide those times.
+        """
+        now = datetime.now(timezone.utc)
+        args = {"p_from": now.isoformat(), "p_to": (now + timedelta(days=8)).isoformat()}
+        return await self._tables.rpc("blocked_times", args) or []
 
     async def menu(self, token: Optional[str] = None) -> dict:
         """Return settings, hours, zones, categories and products in one payload."""
