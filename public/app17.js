@@ -88,7 +88,7 @@ async function linhasRelatorio(tipo) {
   const r = await api("/admin/reports?start=" + de + "&end=" + ate, { auth: true });
   if (tipo === "produtos") return [["Produto", "Quantidade", "Vendas", "Custo", "Lucro"]].concat(r.items.map(i => [i.product, +i.quantity, +i.revenue, +i.cost, Math.round((i.revenue - i.cost) * 100) / 100]));
   if (tipo === "despesas") return [["Data", "Categoria", "Descrição", "Valor"]].concat(r.expenses.map(e => [e.date, e.category, e.description, +e.amount]));
-  return [["N.º", "Data", "Hora", "Estado", "Origem", "Cliente", "Telemóvel", "Zona", "Morada", "Itens", "Pagamento", "Subtotal", "Desconto", "Entrega", "Total", "Custo", "NIF"]].concat(r.orders.map(o => [+o.number, o.date, o.time, ESTADOS[o.status], o.channel || "site", o.customer, o.phone, o.zone, o.address, o.items, o.payment, +o.subtotal, +(o.discount || 0), +o.fee, +o.total, o.cost == null ? "" : +o.cost, o.nif]));
+  return [["N.º", "Data (entrega)", "Hora (entrega)", "Encomendado em", "Estado", "Origem", "Cliente", "Telemóvel", "Zona", "Morada", "Itens", "Pagamento", "Subtotal", "Desconto", "Entrega", "Total", "Custo", "NIF"]].concat(r.orders.map(o => [+o.number, o.date, o.time, o.ordered || "", ESTADOS[o.status], o.channel || "site", o.customer, o.phone, o.zone, o.address, o.items, o.payment, +o.subtotal, +(o.discount || 0), +o.fee, +o.total, o.cost == null ? "" : +o.cost, o.nif]));
 }
 
 /** Atualiza a simulação do ecrã de resultados com os valores escritos. */
