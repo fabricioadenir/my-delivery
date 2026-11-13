@@ -6,7 +6,7 @@ import uuid
 from datetime import datetime, timezone
 
 from backend.repositories import PhotoRepository, TableRepository
-from backend.schemas import CategoryIn, HourIn, PhotoIn, ProductIn, StaffOrderIn, StoreIn
+from backend.schemas import CategoryIn, ClosedTodayIn, HourIn, PhotoIn, ProductIn, StaffOrderIn, StoreIn
 from backend.services_public import MenuService
 from backend.supabase_client import SupabaseError
 
@@ -122,6 +122,10 @@ class AdminService:
         hours = [self._hour_row(h) for h in store.hours]
         await self._tables.upsert("opening_hours", hours, "weekday", token)
         await self._save_zones(store, token)
+
+    async def set_closed_today(self, body: ClosedTodayIn, token: str) -> None:
+        """Close the store for one day without touching the opening hours (null reopens it)."""
+        await self._tables.update("settings", "id", "true", {"closed_on": body.closed_on}, token)
 
     async def upload_photo(self, photo: PhotoIn, token: str) -> dict:
         """Store a product photo and return its public URL."""

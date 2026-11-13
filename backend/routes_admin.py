@@ -4,7 +4,7 @@ from typing import Optional
 from fastapi import APIRouter, Depends, Header
 
 from backend.container import container
-from backend.schemas import CategoryIn, CategoryOrderIn, PhotoIn, ProductIn, StaffOrderIn, StatusIn, StoreIn
+from backend.schemas import CategoryIn, CategoryOrderIn, ClosedTodayIn, PhotoIn, ProductIn, StaffOrderIn, StatusIn, StoreIn
 from backend.supabase_client import SupabaseError
 
 
@@ -83,6 +83,13 @@ async def delete_category(category_id: str, token: str = Depends(staff_token)) -
 async def save_store(store: StoreIn, token: str = Depends(staff_token)) -> dict:
     """Save opening hours, zones, minimum order and preparation time."""
     await container.admin.save_store(store, token)
+    return OK
+
+
+@router.put("/closed-today")
+async def set_closed_today(body: ClosedTodayIn, token: str = Depends(staff_token)) -> dict:
+    """Close the store for today (or reopen it) without changing the opening hours."""
+    await container.admin.set_closed_today(body, token)
     return OK
 
 

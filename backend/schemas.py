@@ -111,6 +111,12 @@ class StatusIn(BaseModel):
     status: OrderStatus
 
 
+class ClosedTodayIn(BaseModel):
+    """Day (Lisbon date, YYYY-MM-DD) on which the store takes no orders, or null to reopen."""
+
+    closed_on: Optional[Annotated[str, Field(pattern=r"^\d{4}-\d{2}-\d{2}$")]] = None
+
+
 class PhotoIn(BaseModel):
     """Product photo as a base64 data URL."""
 
