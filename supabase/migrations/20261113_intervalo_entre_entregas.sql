@@ -1,6 +1,7 @@
 -- Intervalo mínimo de 15 minutos entre entregas.
 -- Cada pedido (não cancelado) ocupa uma hora: a hora agendada, ou, no "o mais cedo possível",
--- a hora do pedido + "Preparação (min)". Outro pedido do site só pode ficar a 15 minutos ou mais dessa hora.
+-- a hora do pedido + "Preparação (min)". Uma encomenda agendada no site só pode ficar a 15 minutos ou mais dessas horas.
+-- "O mais cedo possível" nunca é recusado (é o tempo de preparação e pronto).
 -- Pedidos registados na gestão (create_order_staff) não são bloqueados; a gestão só avisa.
 -- As horas passam a ser escolhidas de 5 em 5 minutos (settings.slot_minutes = 5).
 
@@ -53,16 +54,13 @@ begin
   novo := replace(d,
 '  select id into v_customer from public.customers',
 '  -- intervalo mínimo de 15 minutos entre entregas (um pedido de cada vez decide a hora)
+  -- só nas encomendas agendadas; "o mais cedo possível" nunca é recusado (mas ocupa a hora prevista)
   perform pg_advisory_xact_lock(hashtext(''sakura_horas_entrega''));
-  if exists (
+  if not v_asap and exists (
     select 1 from public.orders o
     where o.status <> ''cancelled''
-      and abs(extract(epoch from public.hora_entrega(o.created_at, o.deliver_at, s.prep_minutes)
-                               - public.hora_entrega(now(), v_deliver, s.prep_minutes))) < 900
+      and abs(extract(epoch from public.hora_entrega(o.created_at, o.deliver_at, s.prep_minutes) - v_deliver)) < 900
   ) then
-    if v_asap then
-      raise exception ''Neste momento não conseguimos entregar o mais cedo possível. Escolha um dia e uma hora.'';
-    end if;
     raise exception ''Essa hora já está ocupada. Escolha outra hora, com pelo menos 15 minutos de diferença.'';
   end if;
 

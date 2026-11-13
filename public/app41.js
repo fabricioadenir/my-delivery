@@ -1,7 +1,7 @@
 /* ---------- intervalo mínimo de 15 minutos entre entregas ----------
  * Cada pedido ocupa uma hora (a agendada ou, no "o mais cedo possível", a hora do pedido + preparação).
- * Site: as horas a menos de 15 min de outro pedido não aparecem; "o mais cedo possível" só aparece se a hora
- * prevista estiver livre. Horas de 5 em 5 minutos. A base de dados (create_order) volta a verificar.
+ * Site: nas encomendas agendadas, as horas a menos de 15 min de outro pedido não aparecem (de 5 em 5 minutos).
+ * "O mais cedo possível" nunca é bloqueado, mas ocupa a hora prevista. A base de dados (create_order) volta a verificar.
  * Gestão → Registar pedido: só avisa (pode gravar na mesma, para exceções).
  */
 let HORAS_OCUPADAS = [];   // [["AAAA-MM-DDTHH:MM", "AAAA-MM-DDTHH:MM"], …] limites exclusivos, hora de Lisboa
@@ -39,14 +39,6 @@ diasDisponiveis = function () {
     .filter(d => d.slots.length);
 };
 
-const podeJaSemIntervalo = podeJa;
-podeJa = function () {
-  if (!podeJaSemIntervalo()) return false;
-  const n = agora(), m = n.min + CONFIG.preparoMin;
-  if (m >= 24 * 60) return true;
-  return !horaOcupada(n.y + "-" + doisD(n.m) + "-" + doisD(n.d), fmtMin(m));
-};
-
 /* Ao abrir o checkout e de minuto a minuto enquanto estiver aberto, atualiza as horas ocupadas. */
 const irFinalizarSemIntervalo = ACOES["ir-finalizar"];
 ACOES["ir-finalizar"] = function (b) { const r = irFinalizarSemIntervalo(b); carregarOcupadas(true); return r; };
@@ -57,7 +49,7 @@ const apiSemIntervalo = api;
 api = async function (caminho, opcoes) {
   try { return await apiSemIntervalo(caminho, opcoes); }
   catch (e) {
-    if (caminho === "/orders" && /hora|mais cedo/i.test(e.message || "")) carregarOcupadas(true);
+    if (caminho === "/orders" && /hora/i.test(e.message || "")) carregarOcupadas(true);
     throw e;
   }
 };
