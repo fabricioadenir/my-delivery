@@ -12,8 +12,7 @@ const CONFIG = {
   // 0 = domingo ... 6 = sábado. null = fechado.
   horario: { 0:["18:00","22:00"], 1:null, 2:null, 3:null, 4:["18:00","22:00"], 5:["18:00","22:00"], 6:["18:00","22:00"] },
   zonas: [
-    { id:"vnp",   nome:"Vila Nova de Paiva", taxa:1.5 },
-    { id:"satao", nome:"Sátão",              taxa:3.0 }
+    { id:"vnp",   nome:"Vila Nova de Paiva", taxa:0 }
   ],
   pagamentos: ["MB WAY","Numerário"]
 };
