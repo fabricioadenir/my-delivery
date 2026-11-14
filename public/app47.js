@@ -1,4 +1,4 @@
-/* ---------- imprimir pelo telemóvel: talão em PDF ----------
+/* ---------- imprimir pelo telemóvel: talão em imagem ou PDF ----------
  * No telemóvel o "Imprimir" do navegador muitas vezes não faz nada (sobretudo com o site
  * instalado como app no iPhone). Por isso a pré-visualização tem agora "Partilhar PDF":
  * gera o talão em PDF (mesmo papel e vias escolhidos) e abre a partilha do telemóvel,
@@ -135,8 +135,73 @@ async function impGerarPdf(p) {
   return new File([pdf.output("blob")], `pedido-${p.number}${p.public_code ? "-" + p.public_code : ""}.pdf`, { type: "application/pdf" });
 }
 
-/** Abre a partilha do telemóvel com o PDF; no computador descarrega-o. */
-async function impEntregarPdf(f) {
+/* ---------- talão em imagem ----------
+ * A Epson Smart Panel mostra o PDF mas imprime-o em branco; imagens imprimem bem.
+ * Por isso, no telemóvel, o talão sai em imagem PNG, desenhada com as mesmas regras do PDF
+ * (o "papel" abaixo imita os métodos do jsPDF que impTalaoPdf usa, em mm, numa tela de 10 px/mm ≈ 254 ppp).
+ */
+const IMP_PXMM = 10;
+function impPapelImagem(ctx) {
+  const px = IMP_PXMM;
+  let tam = 10, neg = false, tracejado = [];
+  const aplicar = () => { ctx.font = `${neg ? 700 : 400} ${tam * 0.3528 * px}px Helvetica, Arial, sans-serif`; };
+  const largura = t => ctx.measureText(t).width / px;
+  return {
+    setFont(_, estilo) { neg = estilo === "bold"; aplicar(); },
+    setFontSize(s) { tam = s; aplicar(); },
+    getTextWidth(t) { aplicar(); return largura(String(t)); },
+    splitTextToSize(t, w) {
+      aplicar(); const linhas = []; let atual = "";
+      String(t).split(/\s+/).filter(Boolean).forEach(pal => {
+        const tenta = atual ? atual + " " + pal : pal;
+        if (largura(tenta) <= w || !atual) atual = tenta; else { linhas.push(atual); atual = pal; }
+      });
+      linhas.push(atual);
+      return linhas;
+    },
+    text(t, x, y, o = {}) {
+      aplicar(); ctx.fillStyle = "#000"; t = String(t);
+      const esp = (o.charSpace || 0) * px;
+      if (!esp) { ctx.textAlign = o.align === "center" ? "center" : o.align === "right" ? "right" : "left"; ctx.fillText(t, x * px, y * px); return; }
+      const total = ctx.measureText(t).width + esp * (t.length - 1);
+      let cx = o.align === "center" ? x * px - total / 2 : o.align === "right" ? x * px - total : x * px;
+      ctx.textAlign = "left";
+      for (const c of t) { ctx.fillText(c, cx, y * px); cx += ctx.measureText(c).width + esp; }
+    },
+    setLineDashPattern(a) { tracejado = (a || []).map(v => v * px); },
+    setLineWidth(w) { ctx.lineWidth = Math.max(1, w * px); },
+    line(x1, y1, x2, y2) { ctx.strokeStyle = "#000"; ctx.setLineDash(tracejado); ctx.beginPath(); ctx.moveTo(x1 * px, y1 * px); ctx.lineTo(x2 * px, y2 * px); ctx.stroke(); ctx.setLineDash([]); },
+    rect(x, y, w, h) { ctx.strokeStyle = "#000"; ctx.setLineDash([]); ctx.strokeRect(x * px, y * px, w * px, h * px); }
+  };
+}
+
+/** Gera o talão em imagem PNG, com o papel e as vias escolhidos. */
+async function impGerarImagem(p) {
+  const pref = impPrefs(), px = IMP_PXMM, vias = pref.vias === 2 ? ["VIA COZINHA", "VIA ENTREGA"] : [""];
+  const tela = (wmm, hmm) => { const c = document.createElement("canvas"); c.width = Math.round(wmm * px); c.height = Math.round(hmm * px); const ctx = c.getContext("2d"); ctx.fillStyle = "#fff"; ctx.fillRect(0, 0, c.width, c.height); return [c, ctx]; };
+  let c;
+  if (pref.papel === "a4") {
+    const [c4, ctx] = tela(210, 297), papel = impPapelImagem(ctx);
+    vias.forEach((v, i) => impTalaoPdf(papel, p, 105 * i + 9, 87, 10, v, "a4", true));
+    if (vias.length === 2) { papel.setLineDashPattern([1.5, 1.5]); papel.setLineWidth(0.2); papel.line(105, 0, 105, 297); }
+    c = c4;
+  } else {
+    const larg = pref.papel === "t58" ? 58 : 80, util = larg === 58 ? 48 : 72, x0 = (larg - util) / 2;
+    const [cm, ctxm] = tela(larg, 10), alturas = vias.map(v => impTalaoPdf(impPapelImagem(ctxm), p, x0, util, 3, v, pref.papel, false) + 6);
+    const [ct, ctx] = tela(larg, alturas.reduce((a, b) => a + b, 0)), papel = impPapelImagem(ctx);
+    let y = 0;
+    vias.forEach((v, i) => {
+      impTalaoPdf(papel, p, x0, util, y + 3, v, pref.papel, true); y += alturas[i];
+      if (i < vias.length - 1) { papel.setLineDashPattern([1, 1]); papel.setLineWidth(0.2); papel.line(0, y, larg, y); papel.setLineDashPattern([]); }
+    });
+    c = ct; void cm;
+  }
+  const blob = await new Promise(ok => c.toBlob(ok, "image/png"));
+  return new File([blob], `pedido-${p.number}${p.public_code ? "-" + p.public_code : ""}.png`, { type: "image/png" });
+}
+
+/** Abre a partilha do telemóvel com o ficheiro; no computador descarrega-o. */
+async function impEntregar(f) {
   if (impTatil() && navigator.canShare && navigator.canShare({ files: [f] })) {
     await navigator.share({ files: [f], title: f.name });
     return;
@@ -146,17 +211,18 @@ async function impEntregarPdf(f) {
   setTimeout(() => URL.revokeObjectURL(url), 60000);
 }
 
-/** Botão "Partilhar PDF": gera e partilha; se o telemóvel pedir outro toque, deixa o PDF pronto. */
-async function impPartilhar() {
+/** Gera (imagem ou PDF) e partilha; se o telemóvel pedir outro toque, deixa o ficheiro pronto. */
+async function impPartilhar(tipo) {
   const p = pedidosLoja.find(x => x.id === impPedidoId);
   if (!p || impPdfA) return;
+  const chave = JSON.stringify(impPrefs()) + tipo;
   try {
-    if (!impPdf || impPdf.id !== p.id || impPdf.pref !== JSON.stringify(impPrefs())) {
-      impPdfA = true; renderFolha();
-      impPdf = { id: p.id, pref: JSON.stringify(impPrefs()), file: await impGerarPdf(p), pronto: false };
+    if (!impPdf || impPdf.id !== p.id || impPdf.pref !== chave) {
+      impPdfA = tipo; renderFolha();
+      impPdf = { id: p.id, pref: chave, tipo, file: tipo === "img" ? await impGerarImagem(p) : await impGerarPdf(p), pronto: false };
     }
     impPdfA = false;
-    try { await impEntregarPdf(impPdf.file); impPdf.pronto = false; }
+    try { await impEntregar(impPdf.file); impPdf.pronto = false; }
     catch (e) {
       if (e && e.name === "AbortError") { renderFolha(); return; }
       impPdf.pronto = true; // o telemóvel exige um toque novo para partilhar
@@ -164,7 +230,7 @@ async function impPartilhar() {
     renderFolha();
   } catch (e) {
     impPdfA = false; renderFolha();
-    brinde("Não foi possível criar o PDF. Verifique a internet e tente outra vez.");
+    brinde(tipo === "img" ? "Não foi possível criar a imagem do talão." : "Não foi possível criar o PDF. Verifique a internet e tente outra vez.");
   }
 }
 
@@ -172,20 +238,23 @@ const vImprimirSemPdf = VISTAS["adm-imprimir"];
 VISTAS["adm-imprimir"] = function () {
   const v = vImprimirSemPdf();
   if (!v.pe) return v;
-  impLibs().catch(() => {}); // adianta o carregamento para o PDF sair rápido
-  const pronto = impPdf && impPdf.pronto && impPdf.id === impPedidoId && impPdf.pref === JSON.stringify(impPrefs());
-  const rotulo = impPdfA ? "A preparar o PDF…" : pronto ? "PDF pronto: tocar para partilhar" : impTatil() ? "Partilhar PDF (Epson Smart Panel)" : "Descarregar PDF";
-  const pdf = `<button type="button" class="btn btn-bloco" data-a="imp-pdf" ${impPdfA ? "disabled" : ""}>${rotulo}</button>`;
-  const nav = `<button type="button" class="btn btn-sec btn-bloco" data-a="imp-imprimir" style="margin-top:.5rem">Imprimir pelo navegador</button>`;
-  v.pe = impTatil() ? pdf + nav : nav.replace("btn btn-sec", "btn").replace(' style="margin-top:.5rem"', "") + pdf.replace('class="btn btn-bloco"', 'class="btn btn-sec btn-bloco" style="margin-top:.5rem"');
-  if (impTatil()) v.corpo = v.corpo.replace('<p class="nota">Na janela de impressão:', '<p class="nota">No telemóvel: toque em "Partilhar PDF" e escolha a <strong>Epson Smart Panel</strong>; lá, imprima em A4 com tamanho real (100%).</p><p class="nota">No computador, na janela de impressão:');
+  if (!impTatil()) impLibs().catch(() => {}); // adianta o carregamento do PDF no computador
+  const pronto = t => impPdf && impPdf.pronto && impPdf.tipo === t && impPdf.id === impPedidoId && impPdf.pref === JSON.stringify(impPrefs()) + t;
+  const botao = (t, rotulo, sec) => `<button type="button" class="btn ${sec ? "btn-sec " : ""}btn-bloco" data-a="imp-partilhar" data-t="${t}" ${impPdfA ? "disabled" : ""}${sec ? ' style="margin-top:.5rem"' : ""}>${impPdfA === t ? "A preparar…" : pronto(t) ? "Pronto: tocar para partilhar" : rotulo}</button>`;
+  if (impTatil()) {
+    v.pe = botao("img", "Partilhar imagem (Epson Smart Panel)") + botao("pdf", "Partilhar PDF", true);
+    v.corpo = v.corpo.replace('<p class="nota">Na janela de impressão:', '<p class="nota">No telemóvel: toque em "Partilhar imagem" e escolha a <strong>Epson Smart Panel</strong>. Lá, papel <strong>A4 normal</strong>, <strong>sem margens desligado</strong> (com margens) e tamanho real.</p><p class="nota">No computador, na janela de impressão:');
+  } else {
+    v.pe = `<button type="button" class="btn btn-bloco" data-a="imp-imprimir">Imprimir</button>` + botao("pdf", "Descarregar PDF", true) + botao("img", "Descarregar imagem", true);
+  }
   return v;
 };
 
 Object.assign(ACOES, {
-  "imp-pdf"() {
-    if (impPdf && impPdf.pronto) { impPdf.pronto = false; impEntregarPdf(impPdf.file).catch(() => {}).finally(renderFolha); return; }
-    impPartilhar();
+  "imp-partilhar"(b) {
+    const t = b.dataset.t;
+    if (impPdf && impPdf.pronto && impPdf.tipo === t) { impPdf.pronto = false; impEntregar(impPdf.file).catch(() => {}).finally(renderFolha); return; }
+    impPartilhar(t);
   }
 });
 
