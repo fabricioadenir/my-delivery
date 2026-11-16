@@ -5,6 +5,7 @@ from fastapi import APIRouter, BackgroundTasks, Header
 
 from backend.container import container
 from backend.schemas import CredentialsIn, OrderIn
+from backend.supabase_client import SupabaseError
 
 router = APIRouter(prefix="/api")
 
@@ -28,13 +29,23 @@ async def blocked_times() -> list:
 
 
 @router.post("/orders")
-async def create_order(order: OrderIn, background: BackgroundTasks, x_cliente: Optional[str] = Header(default=None)) -> dict:
+async def create_order(
+    order: OrderIn, background: BackgroundTasks,
+    x_cliente: Optional[str] = Header(default=None), authorization: Optional[str] = Header(default=None),
+) -> dict:
     """Register an order sent by the public site and notify the staff phones.
 
     With a customer session (header X-Cliente) the order is also linked to the saved data,
     so it shows up in "Os meus pedidos" on any device.
+    A test order ("test": true) needs the staff session; it does not count in sales, stock or the Raio-X.
     """
-    result = await container.orders.create(order)
+    token = None
+    if order.test:
+        if not authorization or not authorization.lower().startswith("bearer "):
+            raise SupabaseError(401, "Para fazer um pedido de teste, entre na gestão neste aparelho.")
+        token = authorization[7:].strip()
+        await container.auth.require_staff(token)
+    result = await container.orders.create(order, token)
     result["saved"] = await container.clients.attach_order(x_cliente, result.get("id"))
     background.add_task(container.push.new_order, dict(result), order.customer_name, order.address_locality)
     if result.get("code"):

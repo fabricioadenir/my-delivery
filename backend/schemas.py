@@ -30,6 +30,7 @@ class OrderIn(BaseModel):
     change_for: Optional[str] = Field(default=None, max_length=40)
     extras: dict[str, Any] = Field(default_factory=dict)
     allergy_notes: Optional[str] = Field(default=None, max_length=1000)
+    test: bool = False   # pedido de teste: só aceite com a sessão da gestão (modo de teste)
 
 
 class StaffOrderIn(OrderIn):

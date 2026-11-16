@@ -105,6 +105,18 @@ async def create_external_order(order: StaffOrderIn, token: str = Depends(staff_
     return await container.admin.create_external_order(order, token)
 
 
+@router.delete("/test-orders")
+async def delete_all_test_orders(token: str = Depends(staff_token)) -> dict:
+    """Delete every test order made in test mode."""
+    return {"deleted": await container.admin.delete_test_orders(None, token)}
+
+
+@router.delete("/test-orders/{order_id}")
+async def delete_test_order(order_id: str, token: str = Depends(staff_token)) -> dict:
+    """Delete one test order (refused for real orders)."""
+    return {"deleted": await container.admin.delete_test_orders(order_id, token)}
+
+
 @router.patch("/orders/{order_id}")
 async def set_order_status(order_id: str, body: StatusIn, token: str = Depends(staff_token)) -> dict:
     """Change the status of an order."""

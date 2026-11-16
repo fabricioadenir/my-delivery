@@ -57,11 +57,16 @@ class OrderService:
         digits = re.sub(r"[^0-9,.]", "", text or "").replace(",", ".")
         return digits if re.fullmatch(r"[0-9]+(\.[0-9]{1,2})?", digits) else None
 
-    async def create(self, order: OrderIn) -> dict:
-        """Register an order and return its number, items and totals."""
+    async def create(self, order: OrderIn, token: Optional[str] = None) -> dict:
+        """Register an order and return its number, items and totals.
+
+        A test order is sent with the staff token, so the database can check that it comes from the team.
+        """
         payload = order.model_dump()
         payload["change_for"] = self._clean_amount(order.change_for)
-        result = await self._tables.rpc("create_order", {"p": payload})
+        if not order.test:
+            payload.pop("test", None)
+        result = await self._tables.rpc("create_order", {"p": payload}, token if order.test else None)
         logger.info("Order created", extra={"order_number": result.get("number")})
         return result
 

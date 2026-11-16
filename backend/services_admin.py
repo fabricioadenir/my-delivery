@@ -140,6 +140,10 @@ class AdminService:
         name = f"{uuid.uuid4().hex}.{'jpg' if kind == 'jpeg' else kind}"
         return {"url": await self._photos.upload(name, raw, f"image/{kind}", token)}
 
+    async def delete_test_orders(self, order_id: str | None, token: str) -> int:
+        """Delete one test order (or all of them). Real orders are never deleted here."""
+        return int(await self._tables.rpc("delete_test_orders", {"p_id": order_id}, token) or 0)
+
     async def set_order_status(self, order_id: str, status: str, token: str) -> None:
         """Change the status of an order and record who changed it."""
         await self._tables.rpc("set_order_status", {"p_order": order_id, "p_status": status}, token)
