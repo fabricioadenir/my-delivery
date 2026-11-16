@@ -51,7 +51,9 @@ function diasDisponiveis() {
     if (!t) continue;
     const slots = [];
     t.forEach(p => {
-      for (let m = toMin(p[0]) + CONFIG.preparoMin; m <= toMin(p[1]); m += CONFIG.intervaloMin) {
+      // agendar começa logo à hora de abertura (16/11); a preparação só conta a partir de agora:
+      // hoje, nenhuma hora antes de agora + preparação
+      for (let m = toMin(p[0]); m <= toMin(p[1]); m += CONFIG.intervaloMin) {
         if (i === 0 && m < n.min + CONFIG.preparoMin) continue;
         slots.push(fmtMin(m));
       }

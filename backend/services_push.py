@@ -17,6 +17,53 @@ SOURCES = {
     "acompanhar-pedido": "Acompanhar pedido",
 }
 
+STEPS = {
+    "dados": "os seus dados", "morada": "morada", "entrega": "quando receber", "acompanhamentos": "acompanhamentos",
+    "pagamento": "pagamento", "observacoes": "observações", "guardar_dados": "guardar dados (PIN)",
+    "fazer_pedido": "tocou em Fazer pedido",
+}
+
+
+def _eur(value: float) -> str:
+    """Format euros the Portuguese way (34,90 €)."""
+    return f"{value:.2f} €".replace(".", ",")
+
+
+def abandon_text(row: dict) -> tuple:
+    """Title and body of the notice for a checkout left without an order."""
+    form = row.get("checkout") if isinstance(row.get("checkout"), dict) else {}
+    try:
+        value = float(row.get("valor") or 0)
+    except (TypeError, ValueError):
+        value = 0.0
+    title = "Desistiu do pedido" + (f" · {_eur(value)}" if value else "")
+    parts = []
+    step = row.get("passo")
+    parts.append(f"Parou em: {STEPS.get(step, step)}" if step else "Não mexeu no formulário")
+    if form.get("quando") == "ja":
+        parts.append("o mais cedo possível")
+    elif form.get("quando") == "agendar" and form.get("dia"):
+        parts.append(f"agendar {form['dia']}" + (f" às {form['hora']}" if form.get("hora") else ""))
+    if form.get("ja") is False and form.get("primeira"):
+        parts.append(f"sem 'o mais cedo possível' (1.ª hora: {form['primeira']})")
+    place = ", ".join(x for x in (form.get("localidade"), form.get("zona")) if x)
+    if place:
+        parts.append(place)
+    errors = row.get("erros") if isinstance(row.get("erros"), list) else []
+    if errors:
+        parts.append(f"Aviso: {errors[-1]}")
+    if row.get("saida"):
+        parts.append(str(row["saida"]).capitalize())
+    seconds = row.get("seg_checkout") or 0
+    if isinstance(seconds, (int, float)) and seconds > 0:
+        parts.append(f"{round(seconds / 60)} min no formulário" if seconds >= 60 else f"{int(seconds)} s no formulário")
+    who = [SOURCES.get(row.get("origem") or "direto", row.get("origem") or "Direto"), row.get("modelo"), row.get("cidade")]
+    parts.append(" · ".join(str(x) for x in who if x))
+    after = row.get("pedido_depois")
+    if isinstance(after, dict) and after.get("numero"):
+        parts.append(f"Depois chegou o pedido n.º {after['numero']} ({_eur(float(after.get('total') or 0))}) — pode ser a mesma pessoa")
+    return title, " · ".join(p for p in parts if p)
+
 
 class PushService:
     """Sends notifications to every staff device that asked for that kind of notice."""
@@ -73,7 +120,41 @@ class PushService:
                          event.get("model") or event.get("os"), event.get("city")]
                 await self.notify("visits", "Nova visita no site", " · ".join(p for p in parts if p), "/?abrir=raiox")
             elif event.get("type") == "finalizar":
-                await self.notify("checkout", "Alguém está a finalizar um pedido", "Abriu o formulário de envio no site.", "/?abrir=raiox", "high")
+                await self.notify("checkout", "Alguém está a finalizar um pedido", self._checkout_body(event), "/?abrir=raiox", "high")
+
+    @staticmethod
+    def _checkout_body(event: dict) -> str:
+        """Describe the cart of someone who just opened the checkout form."""
+        detail = event.get("detail") if isinstance(event.get("detail"), dict) else {}
+        items = detail.get("itens") if isinstance(detail.get("itens"), list) else []
+        try:
+            value = float(event.get("value") or 0)
+        except (TypeError, ValueError):
+            value = 0.0
+        if not value:
+            return "Abriu o formulário de envio no site."
+        n = len(items)
+        products = f" ({n} {'produto' if n == 1 else 'produtos'})" if n else ""
+        return f"Abriu o formulário com {_eur(value)} no carrinho{products}."
+
+    async def abandoned_checkouts(self) -> int:
+        """Notify every visitor who opened the checkout and left it for 10 minutes without ordering.
+
+        The database marks each one as notified, so a visit is only announced once.
+        """
+        if not self._config.push_secret:
+            return 0
+        try:
+            rows = await self._tables.rpc("checkout_abandonos", {"p_secret": self._config.push_secret}) or []
+        except Exception:  # noqa: BLE001
+            logger.exception("Abandoned checkouts failed")
+            return 0
+        sent = 0
+        for row in rows if isinstance(rows, list) else []:
+            if isinstance(row, dict):
+                title, body = abandon_text(row)
+                sent += await self.notify("checkout", title, body, "/?abrir=raiox", "high")
+        return sent
 
     async def new_order(self, order: dict, customer: str, locality: str = "") -> None:
         """Notify a new order with its number, customer, total and locality."""

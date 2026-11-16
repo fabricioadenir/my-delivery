@@ -30,6 +30,15 @@ async def record_events(request: Request, background: BackgroundTasks) -> dict:
     return {"ok": True, "saved": saved}
 
 
+@public_router.post("/abandonos")
+async def abandoned_checkouts() -> dict:
+    """Called every minute by the database (pg_cron) when someone left the checkout without ordering.
+
+    Needs no key: it only sends the notices the database still has pending, and each one only once.
+    """
+    return {"ok": True, "sent": await container.push.abandoned_checkouts()}
+
+
 @admin_router.get("/insights")
 async def insights(
     start: str = Query(pattern=DATE_PATTERN), end: str = Query(pattern=DATE_PATTERN),

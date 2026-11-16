@@ -169,7 +169,7 @@ const abrirSemRaioX = abrir;
 abrir = function (v) {
   abrirSemRaioX(v);
   if (v === "carrinho") rxEvento("carrinho_aberto");
-  else if (v === "finalizar") rxEvento("finalizar");
+  else if (v === "finalizar") rxEvento("finalizar", { value: Math.round(subtotal() * 100) / 100, detail: { itens: S.cart.slice(0, 30).map(i => ({ p: i.id, q: i.q })) } });
   else if (v === "enviado" && S.ultimo) { rxEvento("pedido_enviado", { value: Math.round(((+S.ultimo.sub || 0) + (+S.ultimo.taxa || 0)) * 100) / 100 }); rxEnviar(); }
 };
 
