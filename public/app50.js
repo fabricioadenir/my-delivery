@@ -18,7 +18,7 @@ function vAdmCompra() {
     const novo = l.ing === NOVO_ING;
     return `<div class="dia"><label class="campo"><span>O que comprou</span><select name="ing${n}">${op("", "Escolher…", l.ing)}${estoque.ingredientes.map(i => op(i.id, i.name, l.ing)).join("")}${op(NOVO_ING, "+ Novo ingrediente (não está na lista)", l.ing)}</select></label>
     ${novo ? `<div class="par" style="margin-top:.8rem"><label class="campo"><span>Nome do ingrediente novo</span><input type="text" name="novoNome${n}" value="${esc(l.novoNome || "")}" placeholder="Wasabi em pó, caixas…"></label>
-      <label class="campo"><span>Tipo</span><select name="novoTipo${n}">${op("ingredient", "Ingrediente", l.novoTipo || "ingredient")}${op("packaging", "Embalagem", l.novoTipo)}</select></label></div>
+      <label class="campo"><span>Tipo</span><select name="novoTipo${n}">${opcoesTipo(l.novoTipo)}</select></label></div>
       <small style="display:block;margin-top:.4rem;color:var(--tinta-2)">Fica na lista de ingredientes (calculadora e stock) com a medida escolhida abaixo, e esta compra dá-lhe entrada no stock.</small>` : ""}
     <label class="campo"><span>Quanto pagou por isto (€)</span><input type="text" name="p${n}" inputmode="decimal" value="${esc(l.p)}"></label>
     <div class="par" style="margin-top:.8rem"><label class="campo"><span>Quantas embalagens</span><input type="text" name="emb${n}" inputmode="decimal" value="${esc(l.emb)}"></label><label class="campo"><span>Cada uma traz</span><input type="text" name="cada${n}" inputmode="decimal" value="${esc(l.cada)}"></label></div>
@@ -58,7 +58,7 @@ function corpoCompra() {
       else if (existe) erros.push(`"${existe.name}" já está na lista. Escolha-o em vez de criar outro.`);
       else if (nomes.has(chave)) erros.push(`"${nome}" aparece em duas linhas como novo. Crie-o só numa.`);
       nomes.add(chave);
-      if (total > 0 && preco >= 0) novos.push({ linha: n, body: { name: nome, kind: l.novoTipo === "packaging" ? "packaging" : "ingredient", unit: MEDIDAS[l.medida].base, purchase_price: preco, purchase_qty: total } });
+      if (total > 0 && preco >= 0) novos.push({ linha: n, body: { name: nome, kind: tipoValido(l.novoTipo), unit: MEDIDAS[l.medida].base, purchase_price: preco, purchase_qty: total } });
       return { ingredient_id: NOVO_ING, linha: n, quantity: total, total_price: preco, lot: l.lote.trim() || null, expires_on: l.val || null };
     }
     const ing = estoque.ingredientes.find(i => i.id === l.ing);

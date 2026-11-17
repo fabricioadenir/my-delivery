@@ -8,10 +8,10 @@ REF_PATTERN = r"^[ipc]:[0-9a-f-]{36}$"
 
 
 class IngredientIn(BaseModel):
-    """Ingredient or packaging item with its purchase price."""
+    """Ingredient, packaging, utensil or equipment item with its purchase price."""
 
     name: str = Field(min_length=1, max_length=120)
-    kind: Literal["ingredient", "packaging"] = "ingredient"
+    kind: Literal["ingredient", "packaging", "utensil", "equipment"] = "ingredient"
     unit: Unit = "g"
     purchase_price: float = Field(ge=0, le=99999)
     purchase_qty: float = Field(gt=0, le=9999999)
