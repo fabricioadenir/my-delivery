@@ -174,13 +174,15 @@ Object.assign(ACOES, {
 
 const contactosSemLigacao = contactosPedido;
 /**
- * Ligações para falar com o cliente; o aviso do WhatsApp leva a ligação de acompanhamento.
+ * Ligações para falar com o cliente; o aviso do WhatsApp leva a ligação de acompanhamento
+ * (também no cancelado, desde 18/11: a página mostra "Cancelado").
  * @param {object} p Pedido.
  * @returns {string} HTML das ligações.
  */
 contactosPedido = function (p) {
-  const fim = encodeURIComponent(". " + CONFIG.nome), extra = encodeURIComponent("\nAcompanhe o pedido aqui: " + location.origin + "/?pedido=" + p.id);
-  return p.status === "cancelled" ? contactosSemLigacao(p) : contactosSemLigacao(p).replace(fim + '"', fim + extra + '"');
+  const texto = p.status === "cancelled" ? "\nVeja o pedido aqui: " : "\nAcompanhe o pedido aqui: ";
+  const fim = encodeURIComponent(". " + CONFIG.nome), extra = encodeURIComponent(texto + location.origin + "/?pedido=" + p.id);
+  return contactosSemLigacao(p).replace(fim + '"', fim + extra + '"');
 };
 
 const fecharSemFaixa = fechar;
