@@ -83,6 +83,15 @@ function tocarAviso() {
 }
 
 /**
+ * Rua pronta para o Google Maps: tira o "n", "nº", "n.º", "nr." ou "número" antes do número da porta
+ * ("Rua Doutor Hermínio Teles n19" → "Rua Doutor Hermínio Teles 19"), que o Maps não percebe.
+ * Só para a ligação do mapa; a morada gravada no pedido fica como o cliente a escreveu.
+ * @param {string} rua Rua escrita pelo cliente.
+ * @returns {string} Rua sem a abreviatura de número.
+ */
+const ruaParaMapa = rua => String(rua || "").replace(/(^|[\s,])n(?:r|um|úmero|umero)?\s*\.?\s*[º°o]?\s*\.?\s*(?=\d)/gi, "$1").replace(/\s{2,}/g, " ").trim();
+
+/**
  * Ligações rápidas para falar com o cliente e abrir a morada no mapa.
  * @param {object} p Pedido.
  * @returns {string} HTML das ligações.
@@ -90,7 +99,7 @@ function tocarAviso() {
 function contactosPedido(p) {
   const d = String(p.customer_phone).replace(/\D/g, ""), tel = d.length === 9 ? "351" + d : d;
   const msg = `Olá ${String(p.customer_name).split(" ")[0]}, ${AVISO_CLIENTE[p.status]} (pedido ${p.public_code || p.number}). ${CONFIG.nome}`;
-  const mapa = "https://www.google.com/maps/search/?api=1&query=" + encodeURIComponent(p.address_street + ", " + p.address_locality);
+  const mapa = "https://www.google.com/maps/search/?api=1&query=" + encodeURIComponent(ruaParaMapa(p.address_street) + ", " + p.address_locality);
   return `<p class="adm-acoes"><a class="ligacao" href="tel:${esc(p.customer_phone)}">Ligar</a><a class="ligacao" href="https://wa.me/${tel}?text=${encodeURIComponent(msg)}" target="_blank" rel="noopener">Avisar pelo WhatsApp</a><a class="ligacao" href="${esc(mapa)}" target="_blank" rel="noopener">Abrir no mapa</a></p>`;
 }
 
