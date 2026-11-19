@@ -1,8 +1,8 @@
 /* ---------- acompanhamentos pagos, wasabi grátis e "Acompanha …" nos combinados ----------
  * - Os combinados mostram o que trazem: 1 par de palitos e 2 molhos shoyu por cada 20 peças (arredonda para cima).
  *   O texto é calculado pelo n.º de peças; se a descrição já disser "Acompanha", fica como está.
- * - Categoria "Acompanhamentos" (criada na gestão): os produtos dela não aparecem no menu; o cliente
- *   escolhe-os no fim do pedido, com + / −. São produtos normais: têm preço, contam para o pedido mínimo,
+ * - Categoria "Acompanhamentos" (criada na gestão): aparece no menu antes das Bebidas (desde 19/11) e
+ *   também no fim do pedido, com + / −. São produtos normais: têm preço, contam para o pedido mínimo,
  *   aparecem nos itens do pedido, na gestão e no WhatsApp.
  * - Sai o bloco "Acompanhamentos, sem custo" (pauzinhos, soja, wasabi, gengibre). Fica a pergunta
  *   "Gostaria de wasabi?" (sem custo), obrigatória, gravada em extras.wasabi.
@@ -42,11 +42,24 @@ function incluidoCombinado(p) {
 const textoPares = n => n === 1 ? "1 par de palitos" : n + " pares de palitos";
 const textoIncluido = i => `Acompanha ${i.shoyu} molhos shoyu e ${textoPares(i.pares)}.`;
 
-/* ---------- menu: sem a categoria Acompanhamentos e com "Acompanha …" nos combinados ---------- */
+/* ---------- menu: Acompanhamentos logo antes das Bebidas e "Acompanha …" nos combinados ----------
+ * Pedido do Fabricio (19/11): os acompanhamentos também aparecem no menu, para o cliente saber que existem
+ * antes de chegar ao fim do pedido. A categoria fica antes das Bebidas (ou no fim, se não houver Bebidas),
+ * seja qual for a ordem na gestão. No fim do pedido continua o bloco "Acompanhamentos".
+ */
+const ehCatBebidas = c => !!c && semAcento(c.nome).startsWith("bebida");
+
+/** Categorias pela ordem do menu do site: Acompanhamentos mesmo antes das Bebidas. */
+function categoriasDoMenu(todas) {
+  const acomp = todas.filter(ehCatAcomp), resto = todas.filter(c => !ehCatAcomp(c));
+  const i = resto.findIndex(ehCatBebidas);
+  return i < 0 ? resto.concat(acomp) : [...resto.slice(0, i), ...acomp, ...resto.slice(i)];
+}
+
 const montarComAcomp = montarPagina;
 montarPagina = function () {
   const todas = D.categorias;
-  D.categorias = todas.filter(c => !ehCatAcomp(c));
+  D.categorias = categoriasDoMenu(todas);
   try { montarComAcomp(); } finally { D.categorias = todas; }
   D.produtos.forEach(p => {
     const inc = incluidoCombinado(p);
@@ -159,7 +172,7 @@ const blocoCategoriaSemNota = blocoCategoria;
 blocoCategoria = function (c, i) {
   const h = blocoCategoriaSemNota(c, i);
   if (!ehCatAcomp(c)) return h;
-  return h.replace(/(<\/h3>)/, `$1<p class="nota" style="margin:0 0 .4rem">Estes produtos não aparecem no menu: o cliente escolhe-os no fim do pedido, em "Acompanhamentos", com o preço que puser aqui. Contam para o pedido mínimo.</p>`);
+  return h.replace(/(<\/h3>)/, `$1<p class="nota" style="margin:0 0 .4rem">No site, esta categoria aparece no menu logo antes das Bebidas e também no fim do pedido, em "Acompanhamentos", com o preço que puser aqui. Contam para o pedido mínimo.</p>`);
 };
 
 const vMenuSemAcomp = VISTAS["adm-menu"];
@@ -173,7 +186,7 @@ VISTAS["adm-menu"] = function () {
 ACOES["adm-acomp-criar"] = function () {
   if (catAcomp()) return brinde("A categoria Acompanhamentos já existe");
   adminAcao(async () => {
-    const c = await api("/admin/categories", { method: "POST", auth: true, body: { name: NOME_CAT_ACOMP, description: "Extras escolhidos no fim do pedido.", layout: "list" } });
+    const c = await api("/admin/categories", { method: "POST", auth: true, body: { name: NOME_CAT_ACOMP, description: "Molhos e palitos extra.", layout: "list" } });
     for (const [nome, desc] of [["Par de palitos", "Um par de palitos (hashi)."], ["Molho shoyu", "Uma saqueta de molho shoyu."]]) {
       await api("/admin/products", { method: "POST", auth: true, body: { category_id: c.id, name: nome, description: desc, price: 0.10, min_qty: 1, active: true } });
     }
