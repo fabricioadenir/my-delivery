@@ -112,6 +112,14 @@ function impTalaoPdf(doc, p, x0, w, y, via, papel, desenhar) {
   return y;
 }
 
+/**
+ * Até onde vai o tracejado do meio na folha A4: só até ao fim do talão mais comprido (+ 6 mm),
+ * em vez da folha toda — poupa tinta e tempo, e a folha é cortada nesse tamanho (pedido do Fabricio, 19/11).
+ * @param {number[]} fins Posição y (mm) onde acaba cada talão.
+ * @returns {number} y (mm) do fim do tracejado.
+ */
+const impFimCorte = fins => Math.min(297, Math.max(...fins) + 6);
+
 /** Gera o PDF do pedido com o papel e as vias escolhidos. */
 async function impGerarPdf(p) {
   await impLibs();
@@ -120,8 +128,8 @@ async function impGerarPdf(p) {
   let pdf;
   if (pref.papel === "a4") {
     pdf = new jsPDF({ unit: "mm", format: "a4" });
-    vias.forEach((v, i) => impTalaoPdf(pdf, p, 105 * i + 9, 87, 10, v, "a4", true));
-    if (vias.length === 2) { pdf.setLineDashPattern([1.5, 1.5], 0); pdf.setLineWidth(0.2); pdf.line(105, 0, 105, 297); pdf.setLineDashPattern([], 0); }
+    const fim = impFimCorte(vias.map((v, i) => impTalaoPdf(pdf, p, 105 * i + 9, 87, 10, v, "a4", true)));
+    if (vias.length === 2) { pdf.setLineDashPattern([1.5, 1.5], 0); pdf.setLineWidth(0.2); pdf.line(105, 0, 105, fim); pdf.setLineDashPattern([], 0); }
   } else {
     const papel = pref.papel === "t58" ? 58 : 80, larg = papel === 58 ? 48 : 72;
     vias.forEach(v => {
@@ -182,8 +190,8 @@ async function impGerarImagem(p) {
   let c;
   if (pref.papel === "a4") {
     const [c4, ctx] = tela(210, 297), papel = impPapelImagem(ctx);
-    vias.forEach((v, i) => impTalaoPdf(papel, p, 105 * i + 9, 87, 10, v, "a4", true));
-    if (vias.length === 2) { papel.setLineDashPattern([1.5, 1.5]); papel.setLineWidth(0.2); papel.line(105, 0, 105, 297); }
+    const fim = impFimCorte(vias.map((v, i) => impTalaoPdf(papel, p, 105 * i + 9, 87, 10, v, "a4", true)));
+    if (vias.length === 2) { papel.setLineDashPattern([1.5, 1.5]); papel.setLineWidth(0.2); papel.line(105, 0, 105, fim); }
     c = c4;
   } else {
     const larg = pref.papel === "t58" ? 58 : 80, util = larg === 58 ? 48 : 72, x0 = (larg - util) / 2;
