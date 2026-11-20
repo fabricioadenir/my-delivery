@@ -44,6 +44,12 @@ async def customers(token: str = Depends(staff_token)) -> list:
     return await container.operations.customers(token)
 
 
+@admin_router.get("/customers/overview")
+async def customers_overview(token: str = Depends(staff_token)) -> list:
+    """Return every customer grouped by phone, with history, preferences and saved-data status."""
+    return await container.operations.customers_overview(token)
+
+
 @admin_router.get("/reports")
 async def reports(
     start: str = Query(pattern=DATE_PATTERN), end: str = Query(pattern=DATE_PATTERN),

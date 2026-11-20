@@ -59,6 +59,10 @@ class OperationsService:
         """Return every customer with order count, total spent and favourite product."""
         return await self._tables.rpc("customers_summary", {}, token) or []
 
+    async def customers_overview(self, token: str) -> list:
+        """Return each customer (grouped by phone number) with totals, preferences and order history."""
+        return await self._tables.rpc("customers_overview", {}, token) or []
+
     async def report(self, start: str, end: str, token: str) -> dict:
         """Return orders, products sold and expenses of a period, ready to export."""
         return await self._tables.rpc("report", {"p_from": start, "p_to": end}, token)
