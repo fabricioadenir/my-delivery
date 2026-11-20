@@ -39,9 +39,11 @@ function estadoLoja() {
   return { aberto: false, texto: "Fechado" };
 }
 
+// "O mais cedo possível" fica disponível enquanto a loja estiver aberta, até à hora de fecho do período
+// (20/11, pedido do Fabricio): está aberto, aceita-se o pedido; o tempo de preparação não conta aqui.
 function podeJa() {
   const n = agora();
-  return (turnosDia(n.dow) || []).some(p => n.min >= toMin(p[0]) && n.min + CONFIG.preparoMin <= toMin(p[1]));
+  return (turnosDia(n.dow) || []).some(p => n.min >= toMin(p[0]) && n.min < toMin(p[1]));
 }
 
 function diasDisponiveis() {
