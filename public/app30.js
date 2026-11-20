@@ -53,10 +53,10 @@ function diasDisponiveis() {
     if (!t) continue;
     const slots = [];
     t.forEach(p => {
-      // agendar começa logo à hora de abertura (16/11); a preparação só conta a partir de agora:
-      // hoje, nenhuma hora antes de agora + preparação
+      // agendar começa logo à hora de abertura (16/11) e vai até ao fecho; a preparação não conta (20/11):
+      // é só o tempo indicado ao cliente no "o mais cedo possível". Hoje só se escondem as horas já passadas.
       for (let m = toMin(p[0]); m <= toMin(p[1]); m += CONFIG.intervaloMin) {
-        if (i === 0 && m < n.min + CONFIG.preparoMin) continue;
+        if (i === 0 && m <= n.min) continue;
         slots.push(fmtMin(m));
       }
     });
