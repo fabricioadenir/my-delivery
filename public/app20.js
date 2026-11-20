@@ -1,5 +1,5 @@
 /* ---------- logótipo no círculo da abertura e ícone da conta no telemóvel ---------- */
-const LOGO_ABERTURA = "img/logo-completo.webp";
+const LOGO_ABERTURA = "img/logo-completo-v2.webp"; // logótipo novo enviado pelo Fabricio a 20/11 (antes logo-completo.webp)
 let logoFalhou = false;
 
 document.head.insertAdjacentHTML("beforeend", `<style>
