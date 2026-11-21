@@ -6,7 +6,7 @@ import uuid
 from datetime import datetime, timezone
 
 from backend.repositories import PhotoRepository, TableRepository
-from backend.schemas import CategoryIn, ClosedTodayIn, HourIn, PhotoIn, ProductIn, StaffOrderIn, StoreIn
+from backend.schemas import CategoryIn, ClosedTodayIn, HourIn, OrderEditIn, PhotoIn, ProductIn, StaffOrderIn, StoreIn
 from backend.services_public import MenuService
 from backend.supabase_client import SupabaseError
 
@@ -58,6 +58,17 @@ class AdminService:
         payload = order.model_dump()
         payload["change_for"] = (order.change_for or "").strip() or None
         return await self._tables.rpc("create_order_staff", {"p": payload}, token)
+
+    async def edit_order_items(self, order_id: str, body: OrderEditIn, token: str) -> dict:
+        """Change the products of an order already placed; prices, totals and cost are recalculated."""
+        items = [item.model_dump(exclude_none=True) for item in body.items]
+        try:
+            return await self._tables.rpc(
+                "edit_order_items", {"p_order": order_id, "p_items": items, "p_note": body.note}, token)
+        except SupabaseError as error:
+            if error.status == 404 and "edit_order_items" in error.message:
+                raise SupabaseError(409, "A edição de pedidos ainda não está ativa na base de dados.") from error
+            raise
 
     async def save_category(self, category_id: str | None, category: CategoryIn, token: str) -> dict:
         """Create or update a category."""

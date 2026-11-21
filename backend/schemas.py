@@ -42,6 +42,22 @@ class StaffOrderIn(OrderIn):
     items: list[OrderItemIn] = Field(min_length=1, max_length=80)
 
 
+class OrderEditItemIn(BaseModel):
+    """One line of an order being edited: an existing line (item_id) or a new product (product_id)."""
+
+    item_id: Optional[str] = None
+    product_id: Optional[str] = None
+    quantity: int = Field(ge=0, le=999)
+    option: Optional[Literal["Fresca", "Natural"]] = None
+
+
+class OrderEditIn(BaseModel):
+    """New list of products of an order already placed (lines left out are removed)."""
+
+    items: list[OrderEditItemIn] = Field(min_length=1, max_length=80)
+    note: Optional[str] = Field(default=None, max_length=300)
+
+
 class CredentialsIn(BaseModel):
     """Email and password of a staff account."""
 

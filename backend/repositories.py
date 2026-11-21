@@ -16,7 +16,7 @@ MENU_QUERIES = {
     },
 }
 ORDER_QUERY = {
-    "select": "*,order_items(product_name,quantity,unit_price,line_total)",
+    "select": "*,order_items(id,product_id,product_name,quantity,unit_price,line_total)",
     "order": "created_at.desc", "limit": "50",
 }
 
@@ -62,8 +62,24 @@ class TableRepository:
         return await self._client.request("POST", f"/rest/v1/rpc/{function}", token, json=args)
 
     async def recent_orders(self, token: str) -> list:
-        """Return the latest orders with their items."""
-        return await self.list("orders", ORDER_QUERY, token)
+        """Return the latest orders with their items and the changes made to them after they were placed."""
+        orders = await self.list("orders", ORDER_QUERY, token)
+        ids = [o["id"] for o in orders if o.get("id")]
+        if not ids:
+            return orders
+        try:
+            changes = await self.list("order_changes", {
+                "select": "order_id,summary,note,changed_at,old_total,new_total",
+                "order_id": f"in.({','.join(ids)})", "order": "changed_at.asc",
+            }, token)
+        except SupabaseError:
+            changes = []  # tabela ainda não criada: os pedidos aparecem na mesma
+        by_order: dict[str, list] = {}
+        for change in changes:
+            by_order.setdefault(change["order_id"], []).append(change)
+        for order in orders:
+            order["changes"] = by_order.get(order.get("id"), [])
+        return orders
 
 
 class AuthRepository:
