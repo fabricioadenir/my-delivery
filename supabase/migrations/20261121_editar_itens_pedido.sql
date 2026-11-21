@@ -116,7 +116,7 @@ begin
 
   if coalesce(o.discount, 0) > v_subtotal then
     raise exception 'O desconto (% €) ficava maior do que os produtos (% €). Ajuste o desconto primeiro.',
-      to_char(o.discount, 'FM999990D00'), to_char(v_subtotal, 'FM999990D00');
+      replace(to_char(o.discount, 'FM999990.00'), '.', ','), replace(to_char(v_subtotal, 'FM999990.00'), '.', ',');
   end if;
   v_total := v_subtotal - coalesce(o.discount, 0) + coalesce(o.delivery_fee, 0);
 
