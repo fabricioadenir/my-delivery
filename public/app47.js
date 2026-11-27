@@ -102,6 +102,7 @@ function impTalaoPdf(doc, p, x0, w, y, via, papel, desenhar) {
   }
   const ex = p.extras || {}, extras = [];
   if (typeof ex.wasabi === "boolean") extras.push("Wasabi: " + (ex.wasabi ? "SIM" : "não"));
+  if (typeof ex.gengibre === "boolean" && !("pauzinhos" in ex)) extras.push("Gengibre: " + (ex.gengibre ? "SIM" : "não"));
   if (typeof ex.elastico === "boolean") extras.push("Palitos: " + (ex.elastico ? "COM elástico" : "sem elástico"));
   if (extras.length) { sep(); extras.forEach(t => linha(t, 10, { b: true })); }
   if (p.allergy_notes) caixa("ATENÇÃO: " + p.allergy_notes, 10, true, false);

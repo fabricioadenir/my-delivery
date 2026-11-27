@@ -76,6 +76,7 @@ function talaoHtml(p, papel, via) {
   const origem = p.channel && p.channel !== "site" ? ` · ${esc((typeof ORIGENS !== "undefined" && ORIGENS[p.channel]) || p.channel)}` : " · Site";
   const ex = p.extras || {}, extras = [];
   if (typeof ex.wasabi === "boolean") extras.push("Wasabi: " + (ex.wasabi ? "SIM" : "não"));
+  if (typeof ex.gengibre === "boolean" && !("pauzinhos" in ex)) extras.push("Gengibre: " + (ex.gengibre ? "SIM" : "não"));
   if (typeof ex.elastico === "boolean") extras.push("Palitos: " + (ex.elastico ? "COM elástico" : "sem elástico"));
   let troco = "";
   if (p.change_for && /^(Numerário|Dinheiro)$/.test(p.payment_method || "")) {

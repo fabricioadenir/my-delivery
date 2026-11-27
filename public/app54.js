@@ -239,6 +239,7 @@ function vCliente() {
   const gostos = c.orders ? `<div class="grupo"><h3>Gostos</h3>${cliProdutos(c.products || [])}
       <ul class="cli-linhas" style="margin-top:.6rem">
         ${cliLinha("Wasabi", cliSempre(c.wasabi, "Pede sempre", "Nunca pede"))}
+        ${cliLinha("Gengibre", cliSempre(c.gengibre || {}, "Pede sempre", "Nunca pede"))}
         ${cliLinha("Palitos com elástico", cliSempre(c.elastico, "Sempre", "Nunca"))}
       </ul></div>` : "";
 

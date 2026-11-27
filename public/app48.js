@@ -16,7 +16,7 @@ const CK_PASSOS = {
   nome: "dados", tel: "dados",
   morada: "morada", rotulo: "morada", rua: "morada", localidade: "morada", zona: "morada", ref: "morada", guardar: "morada",
   quando: "entrega", dia: "entrega", hora: "entrega",
-  querWasabi: "acompanhamentos", querElastico: "acompanhamentos",
+  querWasabi: "acompanhamentos", querGengibre: "acompanhamentos", querElastico: "acompanhamentos",
   pag: "pagamento", troco: "pagamento", obs: "observacoes",
   guardarConta: "guardar_dados", pin: "guardar_dados"
 };
@@ -60,6 +60,7 @@ function ckResumo() {
     ja, primeira: d0 && d0.slots[0] ? d0.rotulo + " às " + d0.slots[0] : null,
     pag: r.pag || null,
     wasabi: r.querWasabi || null,
+    gengibre: r.querGengibre || null,
     elastico: palitos ? (r.querElastico || null) : "nao_pergunta",
     conta: typeof sessaoCliente === "function" && sessaoCliente() && S.perfil ? "com_dados" : r.guardarConta ? "guardar" : "convidado",
     subtotal: Math.round(subtotal() * 100) / 100,
@@ -186,6 +187,7 @@ function ckLinhas(c) {
   out.push("Entrega: " + q);
   const ac = [];
   if (k.wasabi) ac.push("wasabi " + (k.wasabi === "sim" ? "sim" : "não")); else ac.push("wasabi por responder");
+  if ("gengibre" in k) ac.push(k.gengibre ? "gengibre " + (k.gengibre === "sim" ? "sim" : "não") : "gengibre por responder");
   if (k.elastico && k.elastico !== "nao_pergunta") ac.push("elástico " + (k.elastico === "sim" ? "sim" : "não"));
   else if (k.elastico === null) ac.push("elástico por responder");
   out.push("Pagamento: " + esc(k.pag || "—") + " · " + ac.join(" · "));
